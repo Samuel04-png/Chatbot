@@ -1,0 +1,7 @@
+[
+  {"pattern": "mandebvu\\s*pharm", "account": "rudo-whatsapp", "facility": "mandebvu-pharmacy"},
+  {"pattern": "mandebvu", "account": "rudo-whatsapp", "facility": "mandebvu-clinic"},
+  {"pattern": "n.?g.?ombe", "account": "rudo-whatsapp", "facility": "ngombe-clinic"},
+  {"pattern": "chelston", "account": "rudo-whatsapp", "facility": "chelstone-clinic"},
+  {"pattern": "avondale", "account": "rudo-whatsapp", "facility": "avondale-clinic"}
+]

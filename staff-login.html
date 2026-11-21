@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rudo · Staff sign-in</title><link rel="icon" href="img/logo.ico"><link rel="stylesheet" href="css/staff-auth.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script defer src="js/rudo-supabase-auth.js"></script><script defer src="js/staff-auth-pages.js"></script>
+</head><body data-page="login">
+<main class="card">
+  <p class="brand">Rudo <span>Staff workspace</span></p>
+  <h1 id="title">Sign in</h1>
+  <p id="state" role="status" aria-live="polite">Checking sign-in configuration…</p>
+  <form id="signin" hidden>
+    <label>Email<input id="email" type="email" autocomplete="username" required maxlength="254"></label>
+    <label>Password<input id="password" type="password" autocomplete="current-password" required maxlength="128"></label>
+    <button type="submit" class="primary">Sign in</button>
+    <button type="button" id="google" hidden>Continue with Google</button>
+    <p class="links"><a href="staff-reset.html">Forgot password?</a> · <a href="#request" id="show-request">Request staff access</a></p>
+  </form>
+  <form id="request" hidden>
+    <label>Work email<input id="request-email" type="email" autocomplete="username" required maxlength="254"></label>
+    <label>New password<input id="request-password" type="password" autocomplete="new-password" required minlength="12" maxlength="128"></label>
+    <p class="hint">Requesting access creates a sign-in only. An administrator must approve your account and assign facilities before any records are visible.</p>
+    <button type="submit" class="primary">Request access</button>
+    <p class="links"><a href="#signin" id="show-signin">Back to sign in</a></p>
+  </form>
+</main>
+</body></html>

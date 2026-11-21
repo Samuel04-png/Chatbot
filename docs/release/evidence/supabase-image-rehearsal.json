@@ -1,0 +1,67 @@
+{
+  "bot_tables_from": "synthetic fixture",
+  "bot_service_role_round_trip_before": true,
+  "migration_applied_as_postgres": true,
+  "bot_service_role_round_trip_after": true,
+  "bot_tables_diff": {
+    "table_acl_unchanged": true,
+    "rls_unchanged": true,
+    "schema_acl_change": [
+      "{pg_database_owner=UC/pg_database_owner,=U/pg_database_owner,postgres=U/pg_database_owner,anon=U/pg_database_owner,authenticated=U/pg_database_owner,service_role=U/pg_database_owner}",
+      "{pg_database_owner=UC/pg_database_owner,=U/pg_database_owner,postgres=U/pg_database_owner,anon=U/pg_database_owner,authenticated=U/pg_database_owner,service_role=U/pg_database_owner,rudo_observer=U/pg_database_owner}"
+    ],
+    "policies_added": [
+      "messages.rudo_observer_read",
+      "orders.rudo_observer_read",
+      "referrals.rudo_observer_read",
+      "users.rudo_observer_read"
+    ],
+    "policies_removed": [],
+    "column_grants_added": [
+      "messages.created_at:rudo_observer:SELECT",
+      "messages.id:rudo_observer:SELECT",
+      "messages.message:rudo_observer:SELECT",
+      "messages.phone:rudo_observer:SELECT",
+      "messages.role:rudo_observer:SELECT",
+      "orders.created_at:rudo_observer:SELECT",
+      "orders.id:rudo_observer:SELECT",
+      "orders.phone:rudo_observer:SELECT",
+      "orders.price:rudo_observer:SELECT",
+      "orders.product:rudo_observer:SELECT",
+      "orders.quantity:rudo_observer:SELECT",
+      "orders.status:rudo_observer:SELECT",
+      "referrals.created_at:rudo_observer:SELECT",
+      "referrals.id:rudo_observer:SELECT",
+      "referrals.phone:rudo_observer:SELECT",
+      "referrals.source:rudo_observer:SELECT",
+      "users.created_at:rudo_observer:SELECT",
+      "users.language:rudo_observer:SELECT",
+      "users.phone:rudo_observer:SELECT",
+      "users.updated_at:rudo_observer:SELECT",
+      "users.user_id:rudo_observer:SELECT"
+    ],
+    "column_grants_removed": []
+  },
+  "only_change_on_bot_tables_is_rudo_observer": true,
+  "anon_has_no_observer_control_access": true,
+  "authenticated_has_no_observer_control_access": true,
+  "service_role_has_no_observer_control_access": true,
+  "rudo_observer_least_privilege": true,
+  "rudo_observer_audit_least_privilege": true,
+  "rudo_staff_admin_least_privilege": true,
+  "ready_endpoint": {
+    "status": "ready"
+  },
+  "real_supabase_signup_pending": true,
+  "real_supabase_admin_resolves_to_staff_id": true,
+  "facility_scope_enforced": true,
+  "history_ordered_and_minimal": true,
+  "orders_scoped": true,
+  "analytics_scoped": true,
+  "admin_invite_via_rudo_staff_admin": true,
+  "bot_service_role_round_trip_with_dashboard_active": true,
+  "rollback_restores_bot_table_state": true,
+  "rollback_keeps_bot_rows": true,
+  "second_apply_and_rollback_cycle": true,
+  "bot_service_role_round_trip_after_rollback": true
+}

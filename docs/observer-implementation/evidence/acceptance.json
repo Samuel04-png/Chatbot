@@ -1,0 +1,79 @@
+{
+  "as_of": "2026-11-21 Africa/Lusaka",
+  "scope": "local synthetic only; candidate helper comparison, not deployed AI validation",
+  "command": "scripts/test_local.sh",
+  "pytest": {
+    "passed": 99,
+    "xfailed": 2,
+    "unexpected_failures": 0,
+    "errors": 0,
+    "passed_by_module": {
+      "tests.test_api": 27,
+      "tests.test_browser": 1,
+      "tests.test_candidate_observer": 1,
+      "tests.test_database": 10,
+      "tests.test_delivery_auth": 13,
+      "tests.test_observer": 43,
+      "tests.test_observer_browser": 1,
+      "tests.test_source_safety": 2,
+      "tests.test_triage": 1
+    },
+    "known_failures": [
+      "tests.test_deferred_transport::test_legacy_delivered_then_late_failed_keeps_delivery_evidence",
+      "tests.test_deferred_transport::test_legacy_stale_completion_cannot_overwrite_reconciled_unknown"
+    ]
+  },
+  "runtime_statement_coverage": {
+    "covered_lines": 795,
+    "num_statements": 858,
+    "percent_covered": 92.65734265734265,
+    "percent_covered_display": "93",
+    "missing_lines": 63,
+    "excluded_lines": 0,
+    "percent_statements_covered": 92.65734265734265,
+    "percent_statements_covered_display": "93"
+  },
+  "observer_statement_coverage": {
+    "covered": 219,
+    "statements": 227,
+    "percent": 96.47577092511013
+  },
+  "observer_browser": {
+    "passed": 17,
+    "checks": [
+      "bounded summary load; history not eagerly fetched",
+      "read-only controls and synthetic-source labels",
+      "on-demand source bigint IDs, roles, timestamps and unknown delivery",
+      "synthetic bot writes visible after explicit history refresh",
+      "bounded older-history pagination without duplicate IDs",
+      "mobile conversation and history layout without horizontal page overflow",
+      "identifier search and source filters",
+      "source-shaped read-only orders with nullable price",
+      "scoped source referrals, attribution and timestamps",
+      "only source-supported analytics",
+      "manual hidden mutation request rejected by server",
+      "source outage clears stale records; independent bot continues; recovery works",
+      "account switch clears cached data and discards delayed prior-user response",
+      "authorized empty dataset is distinct from failure",
+      "analyst aggregate-only navigation",
+      "revoked identity clears records and is rejected",
+      "no page exceptions or real provider calls"
+    ],
+    "pageErrors": []
+  },
+  "legacy_browser_distinct_checks": 7,
+  "original_tests_rerun_passed": 54,
+  "runner_create_and_cleanup_verified": true,
+  "runner_existing_marked_cluster_reuse_verified": true,
+  "unchanged_digests": {
+    "js/risk-triage.js": "b498f0982038ded5bce0668b1bacc4301daa51b7f94924e71c4d6836f4fa822b",
+    "supabase/migrations/202611200001_rudo_private.sql": "175fbdcfe60a601027bbee348c1788f56d70d410235fe2e3d663d7a89a316ff8"
+  },
+  "restrictions": {
+    "remote_calls_this_stage": 0,
+    "remote_changes": 0,
+    "real_patient_data": false,
+    "real_provider_calls": false,
+    "production_deployment": false
+  }
+}

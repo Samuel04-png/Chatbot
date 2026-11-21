@@ -1,0 +1,23 @@
+.......................................xx............................... [ 71%]
+.............................                                            [100%]
+================================ tests coverage ================================
+______________ coverage: platform darwin, python 3.12.14-final-0 _______________
+
+Name                   Stmts   Miss  Cover   Missing
+----------------------------------------------------
+app.py                   259     20    92%   82, 84, 87, 132, 137, 151, 153-154, 165, 191, 205, 245-246, 259, 287, 295, 301, 304, 308, 332
+rudo/__init__.py           0      0   100%
+rudo/auth.py              27      6    78%   21-24, 31-32
+rudo/db.py               177     15    92%   28-29, 78, 99-102, 113, 169, 177, 201, 209-213, 215
+rudo/delivery.py          57     11    81%   28, 40, 47-49, 74-82
+rudo/errors.py             5      0   100%
+rudo/importer.py         106      3    97%   18-19, 40
+rudo/observer.py         137      7    95%   27, 29-30, 139, 162-164
+rudo/observer_api.py      90      1    99%   102
+----------------------------------------------------
+TOTAL                    858     63    93%
+Coverage JSON written to file .local/observer-coverage.json
+=========================== short test summary info ============================
+XFAIL tests/test_deferred_transport.py::test_legacy_delivered_then_late_failed_keeps_delivery_evidence - Deferred owner-contract fix: late failed must not regress delivered. Observer cannot ingest/send.
+XFAIL tests/test_deferred_transport.py::test_legacy_stale_completion_cannot_overwrite_reconciled_unknown - Deferred owner-contract fix: legacy completion lacks claim fencing. Observer never runs delivery worker.
+99 passed, 2 xfailed in 18.17s

@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dawa Health | Dashboard</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="img/logo.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/logo.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="img/logo.ico">
+  <link rel="stylesheet" href="css/admin-light.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <style>
+    /*
+      Green theme override.
+      admin-light.css was not provided alongside index2/index3, so this block
+      remaps the blue "accent" tones the theme uses onto a green palette
+      without touching the underlying stylesheet. If admin-light.css defines
+      its own custom properties under different names, share the file and
+      these can be tightened to match exactly.
+    */
+    :root {
+      --accent: #16a34a;
+      --accent-color: #16a34a;
+      --accent-strong: #15803d;
+      --accent-soft: #dcfce7;
+      --primary: #16a34a;
+      --primary-color: #16a34a;
+      --primary-strong: #15803d;
+      --info: #16a34a;
+      --info-color: #16a34a;
+      --blue: #16a34a;
+      --link-color: #15803d;
+    }
+    .badge-accent {
+      background: #dcfce7 !important;
+      color: #15803d !important;
+      border-color: #86efac !important;
+    }
+    .button {
+      background: #16a34a !important;
+      border-color: #16a34a !important;
+    }
+    .button:hover {
+      background: #15803d !important;
+      border-color: #15803d !important;
+    }
+    .ghost-button:hover {
+      border-color: #16a34a !important;
+      color: #15803d !important;
+    }
+    .nav-link.is-active,
+    .nav-link[aria-current="page"] {
+      background: #dcfce7 !important;
+      color: #15803d !important;
+    }
+    .status-dot {
+      background: #16a34a !important;
+    }
+    a {
+      color: #15803d;
+    }
+    .workspace-status-badge.tone-ok {
+      background: #dcfce7 !important;
+      color: #15803d !important;
+    }
+
+    /* ---------- Priority breakdown ---------- */
+    #priorityBreakdown {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 14px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    .priority-count-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: transparent;
+      border: 1px solid #e6ebe8;
+      transition: border-color 0.15s ease, transform 0.15s ease;
+    }
+    .priority-count-row:hover {
+      border-color: #d7dedb;
+      transform: translateX(2px);
+    }
+    .priority-count-row:has(.badge-danger) 
+    .priority-count-row:has(.badge-warning) 
+    .priority-count-row:has(.badge-accent) 
+    .priority-count-row .badge {
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+    }
+    .priority-count-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #111827;
+      min-width: 26px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .priority-breakdown-card {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .triage-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 32px;
+      padding-top: 16px;
+      border-top: 1px solid #edf1ef;
+    }
+    .triage-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+    }
+    .triage-legend-item .badge {
+      min-width: 96px;
+      max-width: none;
+      white-space: nowrap;
+      overflow: visible;
+      text-overflow: unset;
+      text-align: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .triage-legend-gap { display: none; }
+    .triage-legend-copy {
+      color: #6b7280;
+    }
+
+    /* ---------- Workspace status ---------- */
+    .workspace-status-card .card-head {
+      margin-bottom: 4px;
+    }
+    .workspace-status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+    .workspace-status-row {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 16px 18px;
+      border-radius: 14px;
+      background: #f8faf9;
+      border: 1px solid #e6ebe8;
+      transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .workspace-status-row:hover {
+      background: #ffffff;
+      border-color: #d7dedb;
+      box-shadow: 0 4px 14px rgba(15, 23, 22, 0.06);
+    }
+    .workspace-status-row.is-skeleton {
+      gap: 8px;
+    }
+    .workspace-status-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #6b7280;
+    }
+    .workspace-status-badge {
+      display: inline-flex;
+      align-items: center;
+      align-self: flex-start;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .workspace-status-badge::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .workspace-status-badge.tone-ok {
+      background: #dcfce7 !important;
+      color: #15803d !important;
+    }
+    .workspace-status-badge.tone-warn {
+      background: #fef3c7;
+      color: #b45309;
+    }
+    .workspace-status-badge.tone-alert {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+    .workspace-status-detail {
+      font-size: 13px;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body class="dashboard-body">
+  <div class="mobile-topbar">
+    <button class="icon-button" type="button" data-sidebar-toggle aria-label="Open navigation" aria-expanded="false">Menu</button>
+    <strong>Dashboard</strong>
+    <span class="badge badge-success">Overview</span>
+  </div>
+  <div class="mobile-nav-backdrop" data-sidebar-backdrop></div>
+  <div class="app-shell">
+    <aside class="sidebar" data-sidebar>
+      <div class="sidebar-top">
+        <div class="brand">
+          <div class="brand-mark">
+            <img src="img/logo.png" alt="Dawa Health logo" onerror="this.style.display='none'; this.parentNode.textContent='DH';">
+          </div>
+          <div class="brand-copy">
+            <h1>Dawa Health</h1>
+            <p>Rudo Admin</p>
+          </div>
+        </div>
+        <div class="badge-row">
+          <span class="badge badge-success"><span class="status-dot"></span>Workspace online</span>
+        </div>
+        <section class="sidebar-card">
+          <div class="stat-value" id="liveConversations">0</div>
+          <div class="stat-label">Live conversations active across the workspace right now.</div>
+        </section>
+        <nav class="nav" aria-label="Primary">
+          <a class="nav-link" href="index2.html" data-nav="dashboard" data-close-sidebar><span class="nav-icon"><i class="fa fa-home" aria-hidden="true"></i></span><span>Dashboard</span></a>
+          <a class="nav-link" href="chats.html" data-nav="chats" data-close-sidebar><span class="nav-icon"><i class="fa fa-commenting" aria-hidden="true"></i></span><span>Chats</span></a>
+          <a class="nav-link" href="analytics.html" data-nav="analytics" data-close-sidebar><span class="nav-icon"><i class="fa fa-line-chart" aria-hidden="true"></i></span><span>Analytics</span></a>
+          <a class="nav-link" href="orders.html" data-nav="orders" data-close-sidebar><span class="nav-icon"><i class="fa fa-list" aria-hidden="true"></i></span><span>Orders</span></a>
+          <a class="nav-link" href="profile.html" data-nav="profile" data-close-sidebar><span class="nav-icon"><i class="fa fa-user" aria-hidden="true"></i></span><span>Profile</span></a>
+          <a class="nav-link" href="settings.html" data-nav="settings" data-close-sidebar><span class="nav-icon"><i class="fa fa-cog" aria-hidden="true"></i></span><span>Settings</span></a>
+        </nav>
+      </div>
+      <form class="sidebar-card sidebar-form">
+        <label for="sidebarStartNumber">Start direct WhatsApp thread</label>
+        <input class="control" id="sidebarStartNumber" inputmode="tel" placeholder="e.g. 263771234567" aria-describedby="sidebarStartHelp">
+        <div class="meta-text" id="sidebarStartHelp">Use country code. Continue in Chats to start the thread.</div>
+        <button class="button" type="button" onclick="window.location.href='chats.html'">Start New Chat</button>
+      </form>
+    </aside>
+
+    <main class="panel page-panel">
+      <header class="panel-header sticky">
+        <div class="conversation-header">
+          <div class="header-copy">
+            <p class="eyebrow">Overview</p>
+            <h2 class="panel-title">Dashboard</h2>
+            <p class="panel-subtitle">A cleaner control room for chats, orders, analytics, and overall system health.</p>
+          </div>
+          <div class="header-actions">
+            <button class="ghost-button" type="button" id="refreshDashboard">Refresh</button>
+            <a class="button" href="chats.html">Open Inbox</a>
+          </div>
+        </div>
+      </header>
+
+      <div class="page-scroll">
+        <div class="content-stack">
+          <section class="content-card" style="background:#ffffff;">
+            <div class="conversation-header">
+              <div class="header-copy">
+                <h3 style="font-size:24px; margin:0 0 8px;">Welcome back to Rudo Admin</h3>
+                <p>Review live conversations, order flow, and service performance from one polished workspace.</p>
+              </div>
+              <div class="badge-row">
+                <span class="badge badge-success">Healthcare-ready workspace</span>
+                <span class="badge badge-accent" id="lastSync">Syncing...</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="metrics-grid">
+            <article class="metric-card"><div class="metric-label">Open conversations</div><div class="metric-value" id="openMetric">0</div><div class="metric-footnote">Threads requiring attention</div></article>
+            <article class="metric-card"><div class="metric-label">Orders in queue</div><div class="metric-value" id="ordersMetric">0</div><div class="metric-footnote">Operational workload</div></article>
+            <article class="metric-card"><div class="metric-label">Resolved today</div><div class="metric-value" id="resolvedMetric">0</div><div class="metric-footnote">Inferred from recent conversation updates</div></article>
+            <article class="metric-card"><div class="metric-label">Conversion hints</div><div class="metric-value" id="conversionMetric">0%</div><div class="metric-footnote">Order or payment signals in chats</div></article>
+            <article class="metric-card"><div class="metric-label">System health</div><div class="metric-value" id="healthMetric">Good</div><div class="metric-footnote">Safe fallback if live services are empty</div></article>
+          </section>
+
+          <div class="split-grid dashboard-split">
+            <section class="content-card">
+              <div class="card-head">
+                <h3>Live conversations</h3>
+                <p>Priority triage matches from maternal emergency keywords.</p>
+              </div>
+              <ul class="list-clean dashboard-list" id="recentChats"></ul>
+            </section>
+            <section class="content-card priority-breakdown-card">
+              <div class="card-head">
+                <h3>Priority breakdown</h3>
+                <p>Flagged threads grouped by triage level.</p>
+              </div>
+              <ul class="list-clean" id="priorityBreakdown"></ul>
+              <div class="triage-legend" aria-label="Triage key">
+                <div class="triage-legend-item">
+                  <span class="badge badge-danger">Urgent</span>
+                  <span class="triage-legend-gap" aria-hidden="true"></span>
+                  <span class="triage-legend-copy">Agent follow-up</span>
+                </div>
+                <div class="triage-legend-item">
+                  <span class="badge badge-warning">High</span>
+                  <span class="triage-legend-gap" aria-hidden="true"></span>
+                  <span class="triage-legend-copy">Immediate provider contact</span>
+                </div>
+                <div class="triage-legend-item">
+                  <span class="badge badge-accent">High-moderate</span>
+                  <span class="triage-legend-gap" aria-hidden="true"></span>
+                  <span class="triage-legend-copy">Same-day contact</span>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <div class="triple-grid">
+            <section class="content-card">
+              <div class="card-head">
+                <h3>Top risk categories</h3>
+                <p>Most common emergency categories in flagged chats.</p>
+              </div>
+              <ul class="list-clean" id="riskCategories"></ul>
+            </section>
+            <section class="content-card">
+              <div class="card-head">
+                <h3>Needs reply</h3>
+                <p>Open threads waiting on an agent response.</p>
+              </div>
+              <ul class="list-clean dashboard-list" id="needsReplyList"></ul>
+            </section>
+            <section class="content-card">
+              <div class="card-head">
+                <h3>Orders summary</h3>
+                <p>Current order status mix.</p>
+              </div>
+              <ul class="list-clean" id="ordersSummary"></ul>
+            </section>
+          </div>
+
+          <section class="content-card workspace-status-card">
+            <div class="card-head">
+              <h3>Workspace status</h3>
+              <p>Connectivity and triage readiness for this admin session.</p>
+            </div>
+            <div class="workspace-status-grid" id="systemHealth"></div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+  <script src="js/rudo-auth.js"></script>
+  <script src="js/rudo-api.js"></script>
+  <script src="js/admin-shell.js"></script>
+  <script src="js/risk-triage.js"></script>
+  <script>
+    AdminShell.setupShell('dashboard');
+
+
+
+        function escape(value) {
+      return AdminShell.escapeHtml(value);
+    }
+
+    function toPatientId(phoneOrKey) {
+      return RiskTriage.toPatientId(phoneOrKey);
+    }
+
+    function getText(message) {
+      return String(message?.message || message?.text || message?.content || '').trim();
+    }
+
+    function isGenericSampleText(text) {
+      const value = String(text || '').trim().toLowerCase();
+      if (!value) return true;
+      return /^(hello[!.,]?\s*)?(hi[!.,]?\s*)?(hey[!.,]?\s*)?(how can i help you( today)?[?.!]*)?$/.test(value)
+        || /how can i help you/i.test(value)
+        || /what can i (do|help) for you/i.test(value)
+        || /thanks for (contacting|reaching out)/i.test(value)
+        || /welcome to (rudo|dawa|ulizamama)/i.test(value);
+    }
+
+    function getMeaningfulPreview(messages, fallback = '') {
+      const list = Array.isArray(messages) ? messages : [];
+      for (let i = list.length - 1; i >= 0; i--) {
+        const role = String(list[i]?.role || '').toLowerCase();
+        if (role && role !== 'user') continue;
+        const text = getText(list[i]);
+        if (!isGenericSampleText(text)) return text;
+      }
+      return fallback;
+    }
+
+    function getTimestamp(message) {
+      const raw = message?.timestamp || message?.createdAt || message?.created_at;
+      const date = raw ? new Date(raw) : null;
+      return date && !Number.isNaN(date.getTime()) ? date : null;
+    }
+
+
+
+        function summarize(data, fallbackMode) {
+      const conversations = data.conversations || [];
+      const orders = data.orders || [];
+      const now = new Date();
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+      let openCount = 0;
+      let resolvedToday = 0;
+      let conversionCount = 0;
+      let needsReplyCount = 0;
+
+      const highRiskThreads = [];
+      const needsReplyThreads = [];
+      const priorityCounts = { URGENT: 0, HIGH: 0, 'HIGH-MODERATE': 0 };
+      const categoryCounts = new Map();
+
+      const recentChats = conversations.slice().sort((a, b) => {
+        const aDate = getTimestamp((a.messages || []).slice(-1)[0]) || new Date(0);
+        const bDate = getTimestamp((b.messages || []).slice(-1)[0]) || new Date(0);
+        return bDate - aDate;
+      });
+
+      recentChats.forEach((conversation) => {
+        const messages = Array.isArray(conversation.messages) ? conversation.messages : [];
+        const lastMessage = messages[messages.length - 1];
+        const lastText = getText(lastMessage);
+        const lastRole = String(lastMessage?.role || '').toLowerCase();
+        const lastTime = getTimestamp(lastMessage) || now;
+        const resolved = conversation.status === 'closed';
+
+        if (!resolved) openCount++;
+        if (resolved && lastTime && lastTime >= todayStart) resolvedToday++;
+        if (messages.some((message) => /order|payment|delivery/.test(getText(message).toLowerCase()))) conversionCount++;
+
+        const patientId = toPatientId(conversation.key);
+        const risk = RiskTriage.assessConversation(messages);
+
+        if (!resolved && lastRole === 'user') {
+          needsReplyCount++;
+          needsReplyThreads.push({
+            patientId,
+            lastText: getMeaningfulPreview(messages, 'Awaiting reply'),
+            lastTime,
+            risk
+          });
+        }
+
+        if (risk) {
+          highRiskThreads.push({ key: conversation.key, patientId, risk, lastTime });
+          if (priorityCounts[risk.priority] !== undefined) priorityCounts[risk.priority]++;
+          categoryCounts.set(risk.category, (categoryCounts.get(risk.category) || 0) + 1);
+        }
+      });
+
+      highRiskThreads.sort((a, b) => {
+        if (b.risk.priorityRank !== a.risk.priorityRank) return b.risk.priorityRank - a.risk.priorityRank;
+        return b.lastTime - a.lastTime;
+      });
+
+      needsReplyThreads.sort((a, b) => b.lastTime - a.lastTime);
+
+      const highRiskCount = highRiskThreads.length;
+      const topCategories = [...categoryCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
+      const conversionRate = conversations.length ? `${Math.round((conversionCount / conversations.length) * 100)}%` : '0%';
+
+      document.getElementById('liveConversations').textContent = conversations.length;
+      document.getElementById('openMetric').textContent = openCount;
+      document.getElementById('ordersMetric').textContent = orders.length;
+      document.getElementById('resolvedMetric').textContent = resolvedToday;
+      document.getElementById('conversionMetric').textContent = conversionRate;
+      document.getElementById('healthMetric').textContent = fallbackMode ? 'Fallback' : 'Good';
+      document.getElementById('lastSync').textContent = fallbackMode ? 'Preview mode' : `Updated ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+
+      document.getElementById('recentChats').innerHTML = highRiskThreads.length
+        ? highRiskThreads.slice(0, 8).map((thread) => {
+            const dateStr = escape(thread.lastTime.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }));
+            return `<li class="dashboard-row">
+              <div class="dashboard-row-main">
+                <div class="dashboard-row-topline">
+                  <span class="table-strong">${escape(thread.patientId)}</span>
+                  <span class="badge ${escape(thread.risk.badge)}">${escape(thread.risk.priorityLabel)}</span>
+                </div>
+                <div class="meta-text dashboard-row-meta">${escape(thread.risk.category)} · ${escape(thread.risk.intent)}</div>
+              </div>
+              <strong class="dashboard-row-time">${dateStr}</strong>
+            </li>`;
+          }).join('')
+        : '<li class="dashboard-row empty"><span>No high-risk threads detected</span><strong>-</strong></li>';
+
+      document.getElementById('priorityBreakdown').innerHTML = [
+        ['Urgent', priorityCounts.URGENT, 'badge-danger'],
+        ['High', priorityCounts.HIGH, 'badge-warning'],
+        ['High-moderate', priorityCounts['HIGH-MODERATE'], 'badge-accent']
+      ].map(([label, count, badge]) => `
+        <li class="priority-count-row">
+          <span class="badge ${badge}">${label}</span>
+          <strong class="priority-count-value">${count}</strong>
+        </li>
+      `).join('');
+
+      document.getElementById('riskCategories').innerHTML = topCategories.length
+        ? topCategories.map(([label, count]) => `<li><span>${escape(label)}</span><strong>${count}</strong></li>`).join('')
+        : '<li class="dashboard-row empty"><span>No risk categories yet</span><strong>0</strong></li>';
+
+      document.getElementById('needsReplyList').innerHTML = needsReplyThreads.length
+        ? needsReplyThreads.slice(0, 6).map((thread) => {
+            const dateStr = escape(thread.lastTime.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }));
+            const riskBadge = thread.risk
+              ? `<span class="badge ${escape(thread.risk.badge)}">${escape(thread.risk.priorityLabel)}</span>`
+              : '<span class="badge badge-success">Routine</span>';
+            return `<li class="dashboard-row">
+              <div class="dashboard-row-main">
+                <div class="dashboard-row-topline">
+                  <span class="table-strong">${escape(thread.patientId)}</span>
+                  ${riskBadge}
+                </div>
+                <div class="meta-text dashboard-row-preview">${escape(thread.lastText)}</div>
+              </div>
+              <strong class="dashboard-row-time">${dateStr}</strong>
+            </li>`;
+          }).join('')
+        : '<li class="dashboard-row empty"><span>No threads waiting for reply</span><strong>-</strong></li>';
+
+      const statusCounts = { pending: 0, confirmed: 0, completed: 0, cancelled: 0 };
+      orders.forEach((order) => {
+        const status = String(order.status || 'pending').toLowerCase();
+        if (statusCounts[status] !== undefined) statusCounts[status]++;
+      });
+      document.getElementById('ordersSummary').innerHTML = Object.entries(statusCounts).map(([status, count]) => {
+        return `<li><span>${status[0].toUpperCase() + status.slice(1)}</span><strong>${count}</strong></li>`;
+      }).join('');
+
+      document.getElementById('systemHealth').innerHTML = [
+        {
+          label: 'Chat data source',
+          value: fallbackMode ? 'Unavailable' : 'Connected',
+          tone: conversations.length ? 'ok' : 'warn',
+          detail: `${conversations.length} threads`
+        },
+        {
+          label: 'Order data source',
+          value: fallbackMode ? 'Unavailable' : 'Connected',
+          tone: orders.length ? 'ok' : 'warn',
+          detail: `${orders.length} orders`
+        },
+        {
+          label: 'High-risk triage',
+          value: highRiskCount ? `${highRiskCount} flagged` : 'Clear',
+          tone: highRiskCount ? 'alert' : 'ok',
+          detail: highRiskCount ? 'Review required' : 'No matches'
+        },
+        {
+          label: 'Needs reply queue',
+          value: needsReplyCount ? `${needsReplyCount} waiting` : 'Clear',
+          tone: needsReplyCount ? 'warn' : 'ok',
+          detail: needsReplyCount ? 'Awaiting agent' : 'Caught up'
+        }
+      ].map((item) => `
+        <div class="workspace-status-row">
+          <span class="workspace-status-label">${escape(item.label)}</span>
+          <span class="workspace-status-badge tone-${item.tone}">${escape(item.value)}</span>
+          <span class="workspace-status-detail">${escape(item.detail)}</span>
+        </div>
+      `).join('');
+    }
+
+    function dashboardSkeletonRows(count = 4) {
+      return Array.from({ length: count }, () => `
+        <li><span class="skeleton-line" style="width:64%;"></span><strong class="skeleton-line short" style="width:42px;"></strong></li>
+      `).join('');
+    }
+
+    function workspaceStatusSkeleton() {
+      return Array.from({ length: 4 }, () => `
+        <div class="workspace-status-row is-skeleton">
+          <span class="skeleton-line" style="width:70%;"></span>
+          <span class="skeleton-line short" style="width:72px;"></span>
+          <span class="skeleton-line" style="width:55%;"></span>
+        </div>
+      `).join('');
+    }
+
+    function setDashboardLoading(isLoading) {
+      document.querySelectorAll('.metrics-grid .metric-card').forEach((card) => card.classList.toggle('is-skeleton-card', isLoading));
+      document.getElementById('refreshDashboard').disabled = isLoading;
+      document.getElementById('refreshDashboard').textContent = isLoading ? 'Refreshing...' : 'Refresh';
+      if (isLoading) {
+        document.getElementById('lastSync').textContent = 'Syncing...';
+        document.getElementById('recentChats').innerHTML = dashboardSkeletonRows(4);
+        document.getElementById('priorityBreakdown').innerHTML = dashboardSkeletonRows(3);
+        document.getElementById('riskCategories').innerHTML = dashboardSkeletonRows(4);
+        document.getElementById('needsReplyList').innerHTML = dashboardSkeletonRows(4);
+        document.getElementById('ordersSummary').innerHTML = dashboardSkeletonRows(4);
+        document.getElementById('systemHealth').innerHTML = workspaceStatusSkeleton();
+      }
+    }
+
+    async function loadDashboard() {
+      setDashboardLoading(true);
+      try {
+        const me = await RudoApi.request('/api/me');
+        if (me.role === 'analyst') {
+          const totals = await RudoApi.request('/api/analytics');
+          document.getElementById('liveConversations').textContent = totals.conversations;
+          document.getElementById('ordersMetric').textContent = totals.orders;
+          document.getElementById('healthMetric').textContent = 'Aggregate only';
+          document.getElementById('lastSync').textContent = 'Scoped counts; raw clinical records are restricted.';
+          ['recentChats','priorityBreakdown','riskCategories','needsReplyList','ordersSummary','systemHealth'].forEach(id => document.getElementById(id).replaceChildren());
+          return;
+        }
+        const [rows, orderRows] = await Promise.all([RudoApi.all('/api/conversations'), RudoApi.all('/api/orders')]);
+        summarize({ conversations: rows.map(row => ({ key: row.phone, messages: row.messages, status: row.status })), orders: orderRows.map(row => ({ ...row.payload, status: row.status })) }, false);
+      } catch (error) {
+        document.getElementById('healthMetric').textContent = 'Unavailable';
+        document.getElementById('lastSync').textContent = error.message;
+        ['recentChats','priorityBreakdown','riskCategories','needsReplyList','ordersSummary','systemHealth'].forEach(id => document.getElementById(id).replaceChildren());
+      } finally { setDashboardLoading(false); }
+    }
+
+        document.getElementById('refreshDashboard').addEventListener('click', loadDashboard);
+    document.getElementById('exportReport') && document.getElementById('exportReport').addEventListener('click', () => {
+      const payload = {
+        generatedAt: new Date().toISOString(),
+        openConversations: document.getElementById('openMetric').textContent,
+        ordersInQueue: document.getElementById('ordersMetric').textContent,
+        conversionRate: document.getElementById('conversionMetric').textContent
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'rudo-dashboard-report.json';
+      link.click();
+      URL.revokeObjectURL(url);
+    });
+
+    loadDashboard();
+  </script>
+</body>
+</html>

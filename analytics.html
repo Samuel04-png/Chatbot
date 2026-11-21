@@ -1,0 +1,838 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dawa Health | Analytics</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="img/logo.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/logo.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="img/logo.ico">
+  <link rel="stylesheet" href="css/admin-light.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script src="js/vendor/chart.umd.min.js" integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous"></script>
+  <style>
+    /* Clinical intents card — matches the light card styling already used across analytics.html */
+    .intents-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 20px;
+      margin-top: 16px;
+    }
+    @media (max-width: 900px) {
+      .intents-grid { grid-template-columns: 1fr; }
+    }
+    .intents-bar-col, .intents-heatmap-col {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .intents-chart-shell { position: relative; height: 260px; }
+    .intents-legend {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: #6b7280;
+    }
+    .intents-legend-item { display: flex; align-items: center; gap: 6px; }
+    .intents-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .intents-dot-urgent { background: #da3849; }
+    .intents-dot-high { background: #fec02f; }
+    .intents-dot-moderate { background: #16a34a; }
+    .intents-heatmap-title { font-size: 13px; font-weight: 600; color: #334155; }
+    .intents-heatmap {
+      display: grid;
+      grid-template-columns: 110px repeat(7, 1fr);
+      gap: 4px;
+    }
+    .intents-heatmap-head {
+      font-size: 11px;
+      color: #94a3b8;
+      text-align: center;
+      padding-bottom: 4px;
+    }
+    .intents-heatmap-label {
+      font-size: 12px;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      padding-right: 8px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .intents-heatmap-cell {
+      aspect-ratio: 1 / 1;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: #14532d;
+      background: #f1f5f9;
+      transition: transform 0.12s ease;
+    }
+    .intents-heatmap-cell:hover,
+    .intents-heatmap-cell:focus-visible {
+      transform: scale(1.08);
+      outline: none;
+    }
+    .intents-heatmap-cell.is-empty { background: #f8fafc; color: transparent; }
+    .intents-heatmap-cell.step-1 { background: #eafbf0; color: #14532d; }
+    .intents-heatmap-cell.step-2 { background: #bbf7d0; color: #14532d; }
+    .intents-heatmap-cell.step-3 { background: #86e8ae; color: #14532d; }
+    .intents-heatmap-cell.step-4 { background: #4ade80; color: #052e16; }
+    .intents-heatmap-cell.step-5 { background: #22c55e; color: #ffffff; }
+    .intents-heatmap-cell.step-6 { background: #16a34a; color: #ffffff; }
+    .intents-heatmap-scale {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+    .intents-scale-swatch { width: 14px; height: 14px; border-radius: 4px; }
+    .intents-scale-swatch.step-1 { background: #eafbf0; }
+    .intents-scale-swatch.step-2 { background: #bbf7d0; }
+    .intents-scale-swatch.step-3 { background: #86e8ae; }
+    .intents-scale-swatch.step-4 { background: #4ade80; }
+    .intents-scale-swatch.step-5 { background: #22c55e; }
+    .intents-scale-swatch.step-6 { background: #16a34a; }
+    .intents-card .empty-state { color: #6b7280; font-size: 13px; padding: 12px 0; }
+  </style>
+</head>
+<body class="dashboard-body">
+  <div class="mobile-topbar">
+    <button class="icon-button" type="button" data-sidebar-toggle aria-label="Open navigation" aria-expanded="false">Menu</button>
+    <strong>Analytics</strong>
+    <span class="badge badge-accent">Live</span>
+  </div>
+  <div class="mobile-nav-backdrop" data-sidebar-backdrop></div>
+  <div class="app-shell">
+    <aside class="sidebar" data-sidebar>
+      <div class="sidebar-top">
+        <div class="brand">
+          <div class="brand-mark">
+            <img src="img/logo.png" alt="Dawa Health logo" onerror="this.style.display='none'; this.parentNode.textContent='DH';">
+          </div>
+          <div class="brand-copy">
+            <h1>Dawa Health</h1>
+            <p>Rudo Admin</p>
+          </div>
+        </div>
+        <div class="badge-row">
+          <span class="badge badge-success"><span class="status-dot"></span>Workspace online</span>
+        </div>
+        <section class="sidebar-card">
+          <div class="stat-value" id="sidebarConversationCount">0</div>
+          <div class="stat-label">Tracked conversation threads in the analytics dataset.</div>
+        </section>
+        <nav class="nav" aria-label="Primary">
+          <a class="nav-link" href="index2.html" data-nav="dashboard" data-close-sidebar><span class="nav-icon"><i class="fa fa-home" aria-hidden="true"></i></span><span>Dashboard</span></a>
+          <a class="nav-link" href="chats.html" data-nav="chats" data-close-sidebar><span class="nav-icon"><i class="fa fa-commenting" aria-hidden="true"></i></span><span>Chats</span></a>
+          <a class="nav-link" href="analytics.html" data-nav="analytics" data-close-sidebar><span class="nav-icon"><i class="fa fa-line-chart" aria-hidden="true"></i></span><span>Analytics</span></a>
+          <a class="nav-link" href="orders.html" data-nav="orders" data-close-sidebar><span class="nav-icon"><i class="fa fa-list" aria-hidden="true"></i></span><span>Orders</span></a>
+          <a class="nav-link" href="profile.html" data-nav="profile" data-close-sidebar><span class="nav-icon"><i class="fa fa-user" aria-hidden="true"></i></span><span>Profile</span></a>
+          <a class="nav-link" href="settings.html" data-nav="settings" data-close-sidebar><span class="nav-icon"><i class="fa fa-cog" aria-hidden="true"></i></span><span>Settings</span></a>
+        </nav>
+      </div>
+      <form class="sidebar-card sidebar-form">
+        <label for="sidebarStartNumber">Start direct WhatsApp thread</label>
+        <input class="control" id="sidebarStartNumber" inputmode="tel" placeholder="e.g. 263771234567" aria-describedby="sidebarStartHelp">
+        <div class="meta-text" id="sidebarStartHelp">Use country code. Continue in Chats to start the thread.</div>
+        <button class="button" type="button" onclick="window.location.href='chats.html'">Start New Chat</button>
+      </form>
+    </aside>
+
+    <main class="panel page-panel">
+      <header class="panel-header sticky">
+        <div class="conversation-header">
+          <div class="header-copy">
+            <p class="eyebrow">Insights</p>
+            <h2 class="panel-title">Analytics</h2>
+            <p class="panel-subtitle">Track conversation performance, message volume, top intents, and customer progression.</p>
+          </div>
+          <div class="header-actions">
+            <label class="visually-hidden" for="startDate">Start date</label>
+            <input class="control" id="startDate" type="date">
+            <label class="visually-hidden" for="endDate">End date</label>
+            <input class="control" id="endDate" type="date">
+            <button class="ghost-button" type="button" id="refreshAnalytics">Refresh</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="page-scroll">
+        <div class="content-stack">
+          <div id="analyticsNotice" class="meta-text" aria-live="polite">Loading analytics data...</div>
+
+          <section class="metrics-grid">
+            <article class="metric-card">
+              <div class="metric-label">Total users</div>
+              <div class="metric-value" id="totalConversations">0</div>
+              <div class="metric-footnote">All conversation threads in range</div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-label">Active chats</div>
+              <div class="metric-value" id="activeChats">0</div>
+              <div class="metric-footnote">Threads updated in the last 7 days</div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-label">Resolved chats</div>
+              <div class="metric-value" id="resolvedChats">0</div>
+              <div class="metric-footnote">Threads inferred as closed or completed</div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-label">Avg. response time</div>
+              <div class="metric-value" id="avgResponseTime">0m</div>
+              <div class="metric-footnote">Estimated from user-to-bot reply gaps</div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-label">Conversion rate</div>
+              <div class="metric-value" id="conversionRate">0%</div>
+              <div class="metric-footnote">Threads mentioning orders or payment</div>
+            </article>
+          </section>
+
+          <div class="split-grid">
+            <section class="content-card">
+              <h3>Conversations over time</h3>
+              <p>Message and thread activity over the selected period.</p>
+              <div class="chart-shell"><canvas id="conversationsChart"></canvas></div>
+            </section>
+            <section class="content-card">
+              <h3>Message volume by day</h3>
+              <p>Daily inbound and outbound message counts.</p>
+              <div class="chart-shell"><canvas id="messageVolumeChart"></canvas></div>
+            </section>
+          </div>
+
+          <!-- QR Code Analysis Section -->
+          <section class="content-card qr-card">
+            <div class="conversation-header qr-header">
+              <div class="header-copy">
+                <h3>📉 QR Code Analysis</h3>
+                <p>Referral counts from poster and flyer scans grouped by clinic.</p>
+              </div>
+              <div class="header-actions qr-actions">
+                <span class="meta-text" id="qrLastUpdated" aria-live="polite">Loading referral data…</span>
+                <span class="meta-text" id="qrTotalRecords">0 referral record(s)</span>
+                <button class="ghost-button" type="button" id="refreshQRBtn">Refresh</button>
+              </div>
+            </div>
+            <div id="qrError" class="meta-text qr-error" aria-live="polite"></div>
+            <div id="qrState" class="state-card" hidden></div>
+            <div class="chart-shell qr-chart-shell is-loading" id="qrChartShell"><canvas id="qrChart"></canvas></div>
+          </section>
+
+          <div class="triple-grid">
+            <section class="content-card">
+              <h3>Top intents and questions</h3>
+              <p>Detected from common keywords in message content.</p>
+              <ul class="list-clean" id="topIntents"></ul>
+            </section>
+            <section class="content-card">
+              <h3>Registration completion funnel</h3>
+              <p>Simple funnel states inferred from message content.</p>
+              <ul class="list-clean" id="funnelList"></ul>
+            </section>
+            <section class="content-card">
+              <h3>Recent activity</h3>
+              <p>Latest notable chat updates across the workspace.</p>
+              <ul class="list-clean" id="recentActivity"></ul>
+            </section>
+          </div>
+
+          <section class="content-card intents-card">
+            <div class="conversation-header qr-header">
+              <div class="header-copy">
+                <h3>Clinical Intents</h3>
+                <p>Risk categories detected in patient messages, ranked by mentions, with a weekly rhythm heatmap.</p>
+              </div>
+              <div class="header-actions qr-actions">
+                <span class="meta-text" id="intentsSummary">Loading intent data…</span>
+              </div>
+            </div>
+
+            <div class="intents-grid">
+              <div class="intents-bar-col">
+                <div class="chart-shell intents-chart-shell"><canvas id="intentsChart"></canvas></div>
+                <div class="intents-legend" aria-hidden="true">
+                  <span class="intents-legend-item"><span class="intents-dot intents-dot-urgent"></span>Urgent</span>
+                  <span class="intents-legend-item"><span class="intents-dot intents-dot-high"></span>High</span>
+                  <span class="intents-legend-item"><span class="intents-dot intents-dot-moderate"></span>High-moderate</span>
+                </div>
+              </div>
+              <div class="intents-heatmap-col">
+                <div class="intents-heatmap-title">Mentions by day of week</div>
+                <div class="intents-heatmap" id="intentsHeatmap" role="table" aria-label="Clinical category mentions by day of week"></div>
+                <div class="intents-heatmap-scale" aria-hidden="true">
+                  <span>Fewer</span>
+                  <span class="intents-scale-swatch step-1"></span>
+                  <span class="intents-scale-swatch step-2"></span>
+                  <span class="intents-scale-swatch step-3"></span>
+                  <span class="intents-scale-swatch step-4"></span>
+                  <span class="intents-scale-swatch step-5"></span>
+                  <span class="intents-scale-swatch step-6"></span>
+                  <span>More</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="table-card">
+            <h3>Recent analytics activity</h3>
+            <p>Safe fallback rows are shown if the live dataset is unavailable.</p>
+            <div class="table-wrap">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Thread</th>
+                    <th>Last update</th>
+                    <th>Messages</th>
+                    <th>Status</th>
+                    <th>Intent</th>
+                  </tr>
+                </thead>
+                <tbody id="activityTable"></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+  <script src="js/rudo-auth.js"></script>
+  <script src="js/rudo-api.js"></script>
+  <script src="js/admin-shell.js"></script>
+  <script src="js/risk-triage.js"></script>
+  <script>
+    AdminShell.setupShell('analytics');
+
+    const notice = document.getElementById('analyticsNotice');
+
+    const startDate = document.getElementById('startDate');
+    const endDate = document.getElementById('endDate');
+    const today = new Date();
+    const monthAgo = new Date();
+    monthAgo.setDate(today.getDate() - 30);
+    startDate.valueAsDate = monthAgo;
+    endDate.valueAsDate = today;
+
+    // ── Conversation charts ────────────────────────────────────────────────────
+    const conversationsChart = new Chart(document.getElementById('conversationsChart'), {
+      type: 'line',
+      data: { labels: [], datasets: [{ label: 'Conversations', data: [], borderColor: '#16a34a', backgroundColor: 'rgba(22, 163, 74, 0.12)', tension: 0.35, fill: true }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    });
+
+    const messageVolumeChart = new Chart(document.getElementById('messageVolumeChart'), {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [
+          { label: 'Inbound', data: [], backgroundColor: '#16a34a', borderRadius: 8 },
+          { label: 'Outbound', data: [], backgroundColor: '#bbf7d0', borderRadius: 8 }
+        ]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    // ── Clinical intents chart ─────────────────────────────────────────────────
+    const PRIORITY_COLOR = { URGENT: '#da3849', HIGH: '#fec02f', 'HIGH-MODERATE': '#16a34a' };
+    const HEATMAP_STEPS = ['#eafbf0', '#bbf7d0', '#86e8ae', '#4ade80', '#22c55e', '#16a34a'];
+    const HEATMAP_DAYS = [1, 2, 3, 4, 5, 6, 0]; // Mon..Sun (getDay() indices)
+    const HEATMAP_DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+    const intentsSummary = document.getElementById('intentsSummary');
+    const intentsHeatmapEl = document.getElementById('intentsHeatmap');
+
+    const intentsChart = new Chart(document.getElementById('intentsChart'), {
+      type: 'bar',
+      data: { labels: [], datasets: [{ label: 'Mentions', data: [], backgroundColor: [], borderRadius: 6, maxBarThickness: 10 }] },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#ffffff',
+            titleColor: '#0f172a',
+            bodyColor: '#334155',
+            borderColor: '#dbe3ee',
+            borderWidth: 1,
+            cornerRadius: 12,
+            padding: 12,
+            callbacks: {
+              label: (ctx) => ` ${ctx.parsed.x} mention${ctx.parsed.x === 1 ? '' : 's'}`
+            }
+          }
+        },
+        scales: {
+          x: { beginAtZero: true, ticks: { precision: 0, color: '#6b7280' }, grid: { color: 'rgba(15, 23, 42, 0.08)' } },
+          y: { ticks: { color: '#334155', font: { size: 11 } }, grid: { display: false } }
+        }
+      }
+    });
+
+    // ── QR / Referral chart ────────────────────────────────────────────────────
+    const QR_CLINICS = [
+      { name: 'Mandebvu Clinic',   color: '#16a34a' },
+      { name: 'Avondale Clinic',   color: '#2563eb' },
+      { name: 'Mandebvu Pharmacy', color: '#ffe6cc' },
+      { name: "N'gombe Clinic",    color: '#bbf7d0' },
+      { name: 'Chelstone Clinic',  color: '#94a3b8' }
+    ];
+    const QR_SOURCES = ['Poster 1', 'Flyer'];
+
+    const qrStatus       = document.getElementById('qrLastUpdated');
+    const qrTotalRecords = document.getElementById('qrTotalRecords');
+    const qrError        = document.getElementById('qrError');
+    const qrState        = document.getElementById('qrState');
+    const qrChartShell   = document.getElementById('qrChartShell');
+    const refreshQRBtn   = document.getElementById('refreshQRBtn');
+
+    function buildQRDatasets() {
+      return QR_CLINICS.map((clinic) => ({
+        label: clinic.name,
+        data: [0, 0],
+        backgroundColor: clinic.color,
+        borderColor: clinic.color,
+        borderRadius: 6,
+        barPercentage: 0.32,
+        categoryPercentage: 0.5,
+        maxBarThickness: 10
+      }));
+    }
+
+    const qrChart = new Chart(document.getElementById('qrChart'), {
+      type: 'bar',
+      data: { labels: QR_SOURCES, datasets: buildQRDatasets() },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { color: '#6b7280' },
+            grid: { color: 'rgba(15, 23, 42, 0.08)' },
+            title: { display: true, text: 'Number of Referrals', color: '#6b7280' }
+          },
+          x: {
+            ticks: { color: '#6b7280' },
+            grid: { display: false }
+          }
+        },
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: '#475569',
+              padding: 16,
+              boxWidth: 10,
+              boxHeight: 10,
+              usePointStyle: true,
+              pointStyle: 'rectRounded'
+            }
+          },
+          tooltip: {
+            backgroundColor: '#ffffff',
+            titleColor: '#0f172a',
+            bodyColor: '#334155',
+            borderColor: '#dbe3ee',
+            borderWidth: 1,
+            cornerRadius: 12,
+            padding: 12,
+            displayColors: true
+          }
+        }
+      }
+    });
+
+    function setQRLoading(isLoading) {
+      qrChartShell.classList.toggle('is-loading', isLoading);
+      refreshQRBtn.disabled = isLoading;
+      refreshQRBtn.textContent = isLoading ? 'Refreshing...' : 'Refresh';
+      if (isLoading) {
+        qrState.hidden = true;
+        qrState.innerHTML = '';
+        qrError.textContent = '';
+      }
+    }
+
+    function showQRState(type, title, message) {
+      qrState.hidden = false;
+      // Use AdminShell helper if available, otherwise render simple markup
+      if (AdminShell && AdminShell.stateMarkup) {
+        qrState.innerHTML = AdminShell.stateMarkup(
+          type, title, message,
+          type === 'error' ? 'Try again' : '',
+          type === 'error' ? 'retryQRLoad' : ''
+        );
+        const retry = document.getElementById('retryQRLoad');
+        if (retry) retry.addEventListener('click', () => loadQRAnalytics());
+      } else {
+        qrState.innerHTML = `<p><strong>${AdminShell.escapeHtml ? AdminShell.escapeHtml(title) : title}</strong>: ${message}</p>`;
+      }
+    }
+
+    /**
+     * Load QR referral data directly from Upstash Redis.
+     * Scans all keys matching "referrals*", reads each record,
+     * and tallies counts per clinic per source type.
+     */
+    async function loadQRAnalytics() {
+      setQRLoading(true);
+      try {
+        const data = await RudoApi.request('/api/qr-analytics');
+        QR_CLINICS.forEach((clinic, i) => { qrChart.data.datasets[i].data = [data.counts[clinic.name]['Poster 1'], data.counts[clinic.name]['Flyer']]; });
+        qrChart.update(); qrTotalRecords.textContent = `${data.totalRecords} referral record(s)`;
+        qrStatus.textContent = 'Updated. This chart retains Poster 1 and Flyer; Poster 2 is available in the API pending reporting review.';
+        qrError.textContent = ''; qrState.hidden = true;
+      } catch (error) { showQRState('error', 'Referral analytics unavailable', error.message); }
+      finally { setQRLoading(false); }
+    }
+
+        // ── Conversation analytics (unchanged from original) ───────────────────────
+    function extractPhoneNumber(key) {
+      return key.startsWith('conversation:') ? key.slice(13) : key;
+    }
+
+    function getText(message) {
+      return String(message?.message || message?.text || message?.content || '').trim();
+    }
+
+    function getTimestamp(message) {
+      const raw = message?.timestamp || message?.createdAt || message?.created_at || message?.time;
+      const date = raw ? new Date(raw) : null;
+      return date && !Number.isNaN(date.getTime()) ? date : null;
+    }
+
+
+
+        function inferIntent(text) {
+      const lower = text.toLowerCase();
+      if (/order|payment|delivery|price/.test(lower)) return 'Orders';
+      if (/register|registration|sign up/.test(lower)) return 'Registration';
+      if (/lab|results|test/.test(lower)) return 'Lab results';
+      if (/clinic|appointment|doctor/.test(lower)) return 'Appointments';
+      return 'General support';
+    }
+
+    function analyseConversations(conversations) {
+      const start = new Date(startDate.value);
+      const end = new Date(endDate.value);
+      end.setHours(23, 59, 59, 999);
+
+      const timelineMap = new Map();
+      const intentCount = new Map();
+      const activityRows = [];
+      const recent = [];
+
+      let activeChats = 0;
+      let resolvedChats = 0;
+      let conversions = 0;
+      let responseSamples = [];
+      let funnel = { started: 0, engaged: 0, registered: 0, ordered: 0 };
+
+      conversations.forEach((conversation) => {
+        const messages = Array.isArray(conversation.messages) ? conversation.messages : [];
+        if (!messages.length) return;
+        const phone = conversation.phone;
+        const lastTimestamp = getTimestamp(messages[messages.length - 1]);
+        const inRange = lastTimestamp ? lastTimestamp >= start && lastTimestamp <= end : true;
+        if (!inRange) return;
+
+        const lastText = getText(messages[messages.length - 1]);
+        const resolved = conversation.status === 'closed';
+        const recentWindow = new Date();
+        recentWindow.setDate(recentWindow.getDate() - 7);
+        if (lastTimestamp && lastTimestamp >= recentWindow) activeChats++;
+        if (resolved) resolvedChats++;
+        if (/order|payment|proof|confirmed/i.test(messages.map(getText).join(' '))) conversions++;
+
+        funnel.started++;
+        if (messages.length > 1) funnel.engaged++;
+        if (messages.some((message) => /register|registration/.test(getText(message).toLowerCase()))) funnel.registered++;
+        if (messages.some((message) => /order|payment|delivery/.test(getText(message).toLowerCase()))) funnel.ordered++;
+
+        let previousUserTimestamp = null;
+
+        messages.forEach((message) => {
+          const timestamp = getTimestamp(message);
+          if (!timestamp) return;
+
+          const dayKey = timestamp.toISOString().slice(0, 10);
+          const label = timestamp.toLocaleDateString([], { month: 'short', day: 'numeric' });
+          if (!timelineMap.has(dayKey)) timelineMap.set(dayKey, { label, conversations: new Set(), inbound: 0, outbound: 0 });
+          const bucket = timelineMap.get(dayKey);
+          bucket.conversations.add(phone);
+
+          const role = String(message.role || '').toLowerCase();
+          if (role === 'user') {
+            bucket.inbound++;
+            previousUserTimestamp = timestamp;
+          } else {
+            bucket.outbound++;
+            if (previousUserTimestamp) {
+              responseSamples.push((timestamp - previousUserTimestamp) / 60000);
+              previousUserTimestamp = null;
+            }
+          }
+
+          const text = getText(message);
+          const intent = inferIntent(text);
+          intentCount.set(intent, (intentCount.get(intent) || 0) + 1);
+        });
+
+        const primaryIntent = inferIntent(messages.map(getText).join(' '));
+        activityRows.push({
+          phone,
+          updated: lastTimestamp ? lastTimestamp.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'Unknown',
+          count: messages.length,
+          status: resolved ? 'Resolved' : 'Active',
+          intent: primaryIntent
+        });
+        recent.push({
+          phone,
+          text: lastText || 'Conversation updated',
+          updated: lastTimestamp ? lastTimestamp.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'Unknown'
+        });
+      });
+
+      const timeline = [...timelineMap.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+      const labels = timeline.map(([, value]) => value.label);
+      const conversationValues = timeline.map(([, value]) => value.conversations.size);
+      const inboundValues = timeline.map(([, value]) => value.inbound);
+      const outboundValues = timeline.map(([, value]) => value.outbound);
+      const averageResponse = responseSamples.length
+        ? Math.round(responseSamples.reduce((sum, value) => sum + value, 0) / responseSamples.length)
+        : 0;
+
+      return {
+        totals: {
+          totalConversations: conversations.length,
+          activeChats,
+          resolvedChats,
+          avgResponseTime: `${averageResponse}m`,
+          conversionRate: conversations.length ? `${Math.round((conversions / conversations.length) * 100)}%` : '0%'
+        },
+        labels,
+        conversationValues,
+        inboundValues,
+        outboundValues,
+        intents: [...intentCount.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5),
+        funnel,
+        recent: recent.slice().sort((a, b) => b.updated.localeCompare(a.updated)).slice(0, 5),
+        activityRows: activityRows.slice().sort((a, b) => b.updated.localeCompare(a.updated)).slice(0, 8)
+      };
+    }
+
+    function analyzeClinicalIntents(conversations) {
+      const start = new Date(startDate.value);
+      const end = new Date(endDate.value);
+      end.setHours(23, 59, 59, 999);
+
+      const categoryRows = new Map();
+      const intentCounts = new Map();
+      let totalMatches = 0;
+
+      conversations.forEach((conversation) => {
+        const messages = Array.isArray(conversation.messages) ? conversation.messages : [];
+        messages.forEach((message) => {
+          const role = String(message.role || '').toLowerCase();
+          if (role && role !== 'user') return;
+          const timestamp = getTimestamp(message);
+          if (timestamp && (timestamp < start || timestamp > end)) return;
+
+          const hit = (typeof RiskTriage !== 'undefined' && RiskTriage.assessText)
+            ? RiskTriage.assessText(getText(message))
+            : null;
+          if (!hit) return;
+
+          totalMatches++;
+
+          if (!categoryRows.has(hit.categoryId)) {
+            categoryRows.set(hit.categoryId, {
+              name: hit.category,
+              priority: hit.priority,
+              priorityRank: hit.priorityRank,
+              byDay: [0, 0, 0, 0, 0, 0, 0],
+              total: 0
+            });
+          }
+          const row = categoryRows.get(hit.categoryId);
+          row.total++;
+          if (timestamp) row.byDay[timestamp.getDay()]++;
+
+          const intentKey = hit.intent;
+          if (!intentCounts.has(intentKey)) {
+            intentCounts.set(intentKey, { label: hit.intent, priority: hit.priority, count: 0 });
+          }
+          intentCounts.get(intentKey).count++;
+        });
+      });
+
+      const rows = [...categoryRows.values()].sort((a, b) => b.priorityRank - a.priorityRank || b.total - a.total);
+      const maxCell = rows.reduce((max, row) => Math.max(max, ...row.byDay), 0);
+      const topIntents = [...intentCounts.values()].sort((a, b) => b.count - a.count).slice(0, 8);
+
+      return { rows, maxCell, topIntents, totalMatches };
+    }
+
+    function renderIntentsChart(intentAnalysis) {
+      const { topIntents } = intentAnalysis;
+      intentsChart.data.labels = topIntents.map((i) => i.label);
+      intentsChart.data.datasets[0].data = topIntents.map((i) => i.count);
+      intentsChart.data.datasets[0].backgroundColor = topIntents.map((i) => PRIORITY_COLOR[i.priority] || '#16a34a');
+      intentsChart.update();
+    }
+
+    function intentsHeatmapStep(count, maxCell) {
+      if (!count) return 0;
+      if (!maxCell) return 1;
+      return Math.max(1, Math.ceil((count / maxCell) * HEATMAP_STEPS.length));
+    }
+
+    function renderIntentsHeatmap(intentAnalysis) {
+      const { rows, maxCell } = intentAnalysis;
+
+      if (!rows.length) {
+        intentsHeatmapEl.innerHTML = '<div class="empty-state">No clinical intents matched in this range yet.</div>';
+        return;
+      }
+
+      const headerCells = ['<div class="intents-heatmap-head" aria-hidden="true"></div>']
+        .concat(HEATMAP_DAY_LABELS.map((label) => `<div class="intents-heatmap-head">${AdminShell.escapeHtml(label)}</div>`))
+        .join('');
+
+      const bodyRows = rows.map((row) => {
+        const labelCell = `<div class="intents-heatmap-label" title="${AdminShell.escapeHtml(row.name)}">${AdminShell.escapeHtml(row.name)}</div>`;
+        const dayCells = HEATMAP_DAYS.map((dayIndex, col) => {
+          const count = row.byDay[dayIndex];
+          const step = intentsHeatmapStep(count, maxCell);
+          const stepClass = step ? `step-${step}` : 'is-empty';
+          const dayLabel = HEATMAP_DAY_LABELS[col];
+          const title = `${row.name} · ${dayLabel}: ${count} mention${count === 1 ? '' : 's'}`;
+          return `<div class="intents-heatmap-cell ${stepClass}" tabindex="0" title="${AdminShell.escapeHtml(title)}">${count || ''}</div>`;
+        }).join('');
+        return labelCell + dayCells;
+      }).join('');
+
+      intentsHeatmapEl.innerHTML = headerCells + bodyRows;
+    }
+
+    function renderIntents(intentAnalysis) {
+      intentsSummary.textContent = intentAnalysis.totalMatches
+        ? `${intentAnalysis.totalMatches} clinical mention${intentAnalysis.totalMatches === 1 ? '' : 's'} detected in range`
+        : 'No clinical intents detected in this range';
+      renderIntentsChart(intentAnalysis);
+      renderIntentsHeatmap(intentAnalysis);
+    }
+
+    function renderLists(analysis) {
+      document.getElementById('topIntents').innerHTML = analysis.intents.length
+        ? analysis.intents.map(([label, count]) => `<li><span>${AdminShell.escapeHtml(label)}</span><strong>${count}</strong></li>`).join('')
+        : '<li><span>No intent data yet</span><strong>0</strong></li>';
+
+      document.getElementById('funnelList').innerHTML = [
+        ['Started', analysis.funnel.started],
+        ['Engaged', analysis.funnel.engaged],
+        ['Registered', analysis.funnel.registered],
+        ['Ordered', analysis.funnel.ordered]
+      ].map(([label, count]) => `<li><span>${label}</span><strong>${count}</strong></li>`).join('');
+
+      document.getElementById('recentActivity').innerHTML = analysis.recent.length
+        ? analysis.recent.map((item) => `
+          <li style="display:flex;align-items:flex-start;gap:8px;min-width:0;">
+            <span style="flex:1;min-width:0;overflow:hidden;">
+              ${AdminShell.escapeHtml(item.phone)}
+              <span class="meta-text" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;">${AdminShell.escapeHtml(item.text)}</span>
+            </span>
+            <strong style="flex-shrink:0;text-align:right;">${AdminShell.escapeHtml(item.updated).replace(' at ', '<br>')}</strong>
+          </li>`).join('')
+        : '<li><span>No recent activity</span><strong>-</strong></li>';
+
+      document.getElementById('activityTable').innerHTML = analysis.activityRows.length
+        ? analysis.activityRows.map((row) => `
+          <tr>
+            <td class="table-strong">${AdminShell.escapeHtml(row.phone)}</td>
+            <td>${AdminShell.escapeHtml(row.updated)}</td>
+            <td>${row.count}</td>
+            <td><span class="badge ${row.status === 'Resolved' ? 'badge-success' : 'badge-accent'}">${row.status}</span></td>
+            <td>${AdminShell.escapeHtml(row.intent)}</td>
+          </tr>
+        `).join('')
+        : '<tr><td colspan="5">No activity available for this range.</td></tr>';
+    }
+
+    function updateMetrics(analysis) {
+      document.getElementById('totalConversations').textContent = analysis.totals.totalConversations;
+      document.getElementById('activeChats').textContent = analysis.totals.activeChats;
+      document.getElementById('resolvedChats').textContent = analysis.totals.resolvedChats;
+      document.getElementById('avgResponseTime').textContent = analysis.totals.avgResponseTime;
+      document.getElementById('conversionRate').textContent = analysis.totals.conversionRate;
+      document.getElementById('sidebarConversationCount').textContent = analysis.totals.totalConversations;
+    }
+
+    function updateCharts(analysis) {
+      conversationsChart.data.labels = analysis.labels;
+      conversationsChart.data.datasets[0].data = analysis.conversationValues;
+      conversationsChart.update();
+
+      messageVolumeChart.data.labels = analysis.labels;
+      messageVolumeChart.data.datasets[0].data = analysis.inboundValues;
+      messageVolumeChart.data.datasets[1].data = analysis.outboundValues;
+      messageVolumeChart.update();
+    }
+
+    function skeletonListRows(count = 3) {
+      return Array.from({ length: count }, () => `
+        <li><span class="skeleton-line" style="width:62%;"></span><strong class="skeleton-line short" style="width:34px;"></strong></li>
+      `).join('');
+    }
+
+    function setAnalyticsLoading(isLoading) {
+      document.querySelectorAll('.metrics-grid .metric-card').forEach((card) => card.classList.toggle('is-skeleton-card', isLoading));
+      document.querySelectorAll('.split-grid .chart-shell, .intents-chart-shell').forEach((chart) => chart.classList.toggle('is-loading', isLoading));
+      document.getElementById('refreshAnalytics').disabled = isLoading;
+      document.getElementById('refreshAnalytics').textContent = isLoading ? 'Refreshing...' : 'Refresh';
+      if (isLoading) {
+        document.getElementById('topIntents').innerHTML = skeletonListRows(4);
+        document.getElementById('funnelList').innerHTML = skeletonListRows(4);
+        document.getElementById('recentActivity').innerHTML = skeletonListRows(4);
+        document.getElementById('activityTable').innerHTML = `
+          <tr><td colspan="5">${AdminShell.skeletonLines(4)}</td></tr>
+        `;
+        intentsSummary.textContent = 'Loading intent data…';
+        intentsHeatmapEl.innerHTML = AdminShell.skeletonLines(4);
+      }
+    }
+
+    async function loadAnalytics() {
+      setAnalyticsLoading(true);
+      try {
+        const rows = await RudoApi.all('/api/conversations');
+        const conversations = rows.map(row => ({ key: row.id, phone: row.phone, messages: row.messages, status: row.status }));
+        const analysis = analyseConversations(conversations);
+        updateMetrics(analysis); updateCharts(analysis); renderLists(analysis);
+        renderIntents(analyzeClinicalIntents(conversations));
+        notice.textContent = `Updated from ${conversations.length} scoped conversation(s). Metrics retain legacy heuristic definitions pending review.`;
+      } catch (error) { notice.textContent = error.message; }
+      finally { setAnalyticsLoading(false); }
+    }
+
+        // ── Kick everything off ────────────────────────────────────────────────────
+    document.getElementById('refreshAnalytics').addEventListener('click', loadAnalytics);
+    refreshQRBtn.addEventListener('click', () => loadQRAnalytics());
+
+    loadAnalytics();
+    loadQRAnalytics();
+  </script>
+</body>
+</html>

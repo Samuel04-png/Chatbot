@@ -1,0 +1,23 @@
+{
+  "passed": 17,
+  "checks": [
+    "bounded summary load; history not eagerly fetched",
+    "read-only controls and synthetic-source labels",
+    "on-demand source bigint IDs, roles, timestamps and unknown delivery",
+    "synthetic bot writes visible after explicit history refresh",
+    "bounded older-history pagination without duplicate IDs",
+    "mobile conversation and history layout without horizontal page overflow",
+    "identifier search and source filters",
+    "source-shaped read-only orders with nullable price",
+    "scoped source referrals, attribution and timestamps",
+    "only source-supported analytics",
+    "manual hidden mutation request rejected by server",
+    "source outage clears stale records; independent bot continues; recovery works",
+    "account switch clears cached data and discards delayed prior-user response",
+    "authorized empty dataset is distinct from failure",
+    "analyst aggregate-only navigation",
+    "revoked identity clears records and is rejected",
+    "no page exceptions or real provider calls"
+  ],
+  "pageErrors": []
+}

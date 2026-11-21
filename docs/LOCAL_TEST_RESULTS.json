@@ -1,0 +1,15 @@
+{
+  "date": "2026-11-20",
+  "scope": "synthetic, offline except isolated loopback PostgreSQL",
+  "tests": 54,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "coverage_percent": 91.2,
+  "python": "3.12.14",
+  "postgresql": "17.12",
+  "remote_mutations": false,
+  "real_data_imported": false,
+  "real_messages_sent": false,
+  "migration_sha256": "175fbdcfe60a601027bbee348c1788f56d70d410235fe2e3d663d7a89a316ff8"
+}

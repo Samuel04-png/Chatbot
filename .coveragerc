@@ -1,0 +1,4 @@
+[run]
+omit = rudo/synthetic.py
+[report]
+show_missing = True

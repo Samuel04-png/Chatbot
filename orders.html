@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dawa Health | Orders</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="img/logo.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/logo.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="img/logo.ico">
+  <link rel="stylesheet" href="css/admin-light.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body class="dashboard-body">
+  <div class="mobile-topbar">
+    <button class="icon-button" type="button" data-sidebar-toggle aria-label="Open navigation" aria-expanded="false">Menu</button>
+    <strong>Orders</strong>
+    <span class="badge badge-warning">Operations</span>
+  </div>
+  <div class="mobile-nav-backdrop" data-sidebar-backdrop></div>
+  <div class="app-shell">
+    <aside class="sidebar" data-sidebar>
+      <div class="sidebar-top">
+        <div class="brand">
+          <div class="brand-mark">
+            <img src="img/logo.png" alt="Dawa Health logo" onerror="this.style.display='none'; this.parentNode.textContent='DH';">
+          </div>
+          <div class="brand-copy">
+            <h1>Dawa Health</h1>
+            <p>Rudo Admin</p>
+          </div>
+        </div>
+        <div class="badge-row">
+          <span class="badge badge-success"><span class="status-dot"></span>Workspace online</span>
+        </div>
+        <section class="sidebar-card">
+          <div class="stat-value" id="orderCount">0</div>
+          <div class="stat-label">Orders currently available in the workspace.</div>
+        </section>
+       <nav class="nav" aria-label="Primary">
+          <a class="nav-link" href="index2.html" data-nav="dashboard" data-close-sidebar><span class="nav-icon"><i class="fa fa-home" aria-hidden="true"></i></span><span>Dashboard</span></a>
+          <a class="nav-link" href="chats.html" data-nav="chats" data-close-sidebar><span class="nav-icon"><i class="fa fa-commenting" aria-hidden="true"></i></span><span>Chats</span></a>
+          <a class="nav-link" href="analytics.html" data-nav="analytics" data-close-sidebar><span class="nav-icon"><i class="fa fa-line-chart" aria-hidden="true"></i></span><span>Analytics</span></a>
+          <a class="nav-link" href="orders.html" data-nav="orders" data-close-sidebar><span class="nav-icon"><i class="fa fa-list" aria-hidden="true"></i></span><span>Orders</span></a>
+          <a class="nav-link" href="profile.html" data-nav="profile" data-close-sidebar><span class="nav-icon"><i class="fa fa-user" aria-hidden="true"></i></span><span>Profile</span></a>
+          <a class="nav-link" href="settings.html" data-nav="settings" data-close-sidebar><span class="nav-icon"><i class="fa fa-cog" aria-hidden="true"></i></span><span>Settings</span></a>
+        </nav>
+      </div>
+      <form class="sidebar-card sidebar-form">
+        <label for="sidebarStartNumber">Start direct WhatsApp thread</label>
+        <input class="control" id="sidebarStartNumber" inputmode="tel" placeholder="e.g. 263771234567" aria-describedby="sidebarStartHelp">
+        <div class="meta-text" id="sidebarStartHelp">Use country code. Continue in Chats to start the thread.</div>
+        <button class="button" type="button" onclick="window.location.href='chats.html'">Start New Chat</button>
+      </form>
+    </aside>
+
+    <main class="panel page-panel">
+      <header class="panel-header sticky">
+        <div class="conversation-header">
+          <div class="header-copy">
+            <p class="eyebrow">Operations</p>
+            <h2 class="panel-title">Orders</h2>
+            <p class="panel-subtitle">Manage incoming healthcare and product orders with cleaner filtering and safer empty states.</p>
+          </div>
+          <div class="header-actions">
+            <label class="visually-hidden" for="orderSearch">Search orders</label>
+            <input class="search-input" id="orderSearch" placeholder="Search customer phone, product, or key">
+            <label class="visually-hidden" for="statusFilter">Filter orders by status</label>
+            <select class="filter-select" id="statusFilter">
+              <option value="all">All statuses</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+              <option value="paid">Paid</option>
+              <option value="unpaid">Unpaid</option>
+              <option value="collected">Collected</option>
+              <option value="delivered">Delivered</option>
+            </select>
+            <button class="ghost-button" type="button" id="refreshOrders">Refresh</button>
+          </div>
+        </div>
+        <div class="chips" id="statusTabs" role="tablist" aria-label="Order status tabs">
+          <button class="chip active" type="button" data-status="all">All</button>
+          <button class="chip" type="button" data-status="pending">Pending</button>
+          <button class="chip" type="button" data-status="confirmed">Confirmed</button>
+          <button class="chip" type="button" data-status="completed">Completed</button>
+          <button class="chip" type="button" data-status="cancelled">Cancelled</button>
+        </div>
+      </header>
+
+      <div class="page-scroll">
+        <div class="content-stack">
+          <section class="metrics-grid">
+            <article class="metric-card"><div class="metric-label">Pending</div><div class="metric-value" id="pendingCount">0</div><div class="metric-footnote">Awaiting action</div></article>
+            <article class="metric-card"><div class="metric-label">Confirmed</div><div class="metric-value" id="confirmedCount">0</div><div class="metric-footnote">Validated orders</div></article>
+            <article class="metric-card"><div class="metric-label">Completed</div><div class="metric-value" id="completedCount">0</div><div class="metric-footnote">Closed successfully</div></article>
+            <article class="metric-card"><div class="metric-label">Cancelled</div><div class="metric-value" id="cancelledCount">0</div><div class="metric-footnote">Stopped orders</div></article>
+            <article class="metric-card"><div class="metric-label">Revenue hints</div><div class="metric-value" id="revenueValue">0</div><div class="metric-footnote">Sum of parsable order amounts</div></article>
+          </section>
+
+          <section class="table-card">
+            <h3>Order queue</h3>
+            <p>Statuses can be updated inline. Missing values fall back safely without crashing the page.</p>
+            <div id="ordersState" class="meta-text" style="margin-top:12px;">Loading orders...</div>
+            <div class="orders-grid" id="ordersContainer"></div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+  <script src="js/rudo-auth.js"></script>
+  <script src="js/rudo-api.js"></script>
+  <script src="js/admin-shell.js"></script>
+  <script>
+    AdminShell.setupShell('orders');
+
+
+
+        const orderSearch = document.getElementById('orderSearch');
+    const statusFilter = document.getElementById('statusFilter');
+    const ordersContainer = document.getElementById('ordersContainer');
+    const ordersState = document.getElementById('ordersState');
+
+    let orders = [];
+    let activeTab = 'all';
+
+    function normalizeStatus(value) {
+      const status = String(value || 'pending').toLowerCase();
+      if (['pending', 'confirmed', 'completed', 'cancelled', 'paid', 'unpaid', 'collected', 'delivered'].includes(status)) {
+        return status;
+      }
+      return 'pending';
+    }
+
+    function badgeClass(status) {
+      if (status === 'completed' || status === 'paid' || status === 'confirmed') return 'badge-success';
+      if (status === 'cancelled' || status === 'unpaid') return 'badge-danger';
+      if (status === 'pending') return 'badge-warning';
+      return 'badge-accent';
+    }
+
+    function parseAmount(value) {
+      const match = String(value || '').replace(/,/g, '').match(/-?\d+(\.\d+)?/);
+      return match ? Number(match[0]) : 0;
+    }
+
+    function escape(value) {
+      return AdminShell.escapeHtml(value);
+    }
+
+    // Upstash sometimes stores order payloads as JSON, and sometimes as a
+    // JSON string *containing* JSON (double-encoded, e.g. "{\"a\":1}").
+    // Keep parsing until we land on an actual object, or give up safely.
+    function parseOrderPayload(raw) {
+      let value = raw;
+      let attempts = 0;
+      while (typeof value === 'string' && attempts < 3) {
+        try {
+          value = JSON.parse(value);
+        } catch (error) {
+          return null;
+        }
+        attempts++;
+      }
+      return value && typeof value === 'object' ? value : null;
+    }
+
+
+
+        function setOrdersLoading(isLoading) {
+      document.querySelectorAll('.metrics-grid .metric-card').forEach((card) => card.classList.toggle('is-skeleton-card', isLoading));
+      document.getElementById('refreshOrders').disabled = isLoading;
+      document.getElementById('refreshOrders').textContent = isLoading ? 'Refreshing...' : 'Refresh';
+      if (isLoading) {
+        ordersContainer.innerHTML = `
+          <div class="skeleton-state">${AdminShell.skeletonLines(4)}</div>
+          <div class="skeleton-state">${AdminShell.skeletonLines(4)}</div>
+          <div class="skeleton-state">${AdminShell.skeletonLines(4)}</div>
+        `;
+      }
+    }
+
+    async function fetchOrders() {
+      setOrdersLoading(true); ordersState.textContent = 'Refreshing orders...';
+      try {
+        const rows = await RudoApi.all('/api/orders');
+        orders = rows.map(row => {
+          const order = row.payload;
+          return { ...order, _key: row.id, version: row.version, raw: order,
+            orderId: order.orderId || order.order_id || row.id,
+            customerPhone: order.customerPhone || order.sender || order.phone || 'Unknown',
+            product: order.product || order.item || order.service || 'Unspecified item',
+            amount: order.amount || order.price || order.total || '',
+            timestamp: row.created_at, status: row.status };
+        });
+        ordersState.textContent = `Loaded ${orders.length} order(s).`;
+      } catch (error) { orders = []; ordersState.textContent = error.message; }
+      finally { setOrdersLoading(false); renderOrders(); }
+    }
+
+        function filteredOrders() {
+      const query = orderSearch.value.trim().toLowerCase();
+      const dropdownStatus = statusFilter.value;
+
+      return orders.filter((order) => {
+        const normalized = normalizeStatus(order.status);
+        const matchesTab = activeTab === 'all' || normalized === activeTab;
+        const matchesDropdown = dropdownStatus === 'all' || normalized === dropdownStatus;
+        const haystack = [order.orderId, order.customerPhone, order.product, order.address, order._key].join(' ').toLowerCase();
+        const matchesQuery = !query || haystack.includes(query);
+        return matchesTab && matchesDropdown && matchesQuery;
+      });
+    }
+
+    function updateStats() {
+      const counts = {
+        pending: 0,
+        confirmed: 0,
+        completed: 0,
+        cancelled: 0
+      };
+      let revenue = 0;
+
+      orders.forEach((order) => {
+        const status = normalizeStatus(order.status);
+        if (counts[status] !== undefined) counts[status]++;
+        revenue += parseAmount(order.amount);
+      });
+
+      document.getElementById('orderCount').textContent = orders.length;
+      document.getElementById('pendingCount').textContent = counts.pending;
+      document.getElementById('confirmedCount').textContent = counts.confirmed;
+      document.getElementById('completedCount').textContent = counts.completed;
+      document.getElementById('cancelledCount').textContent = counts.cancelled;
+      document.getElementById('revenueValue').textContent = revenue ? revenue.toFixed(2) : '0';
+    }
+
+    async function saveStatus(order, select, button) {
+      button.disabled = true;
+      try {
+        const row = await RudoApi.request(`/api/orders/${order._key}`, { method: 'PATCH', body: JSON.stringify({ status: normalizeStatus(select.value), version: order.version }) });
+        order.status = row.status; order.version = row.version;
+        ordersState.textContent = 'Order status saved.';
+      } catch (error) { ordersState.textContent = error.message; }
+      finally { button.disabled = false; renderOrders(); }
+    }
+
+        function renderOrders() {
+      updateStats();
+      const visibleOrders = filteredOrders();
+
+      if (!visibleOrders.length) {
+        ordersContainer.innerHTML = '<div class="empty-state">No orders match the current search or filter.</div>';
+        return;
+      }
+
+      ordersContainer.innerHTML = '';
+      visibleOrders.forEach((order) => {
+        const status = normalizeStatus(order.status);
+        const card = document.createElement('article');
+        card.className = 'order-row';
+        card.innerHTML = `
+          <div class="order-cell">
+            <div class="order-title">${escape(order.product)}${order.quantity ? ` × ${escape(order.quantity)}` : ''}</div>
+            <div class="order-subtitle">Order ID: ${escape(order.orderId)}</div>
+          </div>
+          <div class="order-cell">
+            <div class="table-strong">${escape(order.customerPhone)}</div>
+            <div class="order-subtitle">Customer phone</div>
+            ${order.address ? `<div class="order-subtitle" style="margin-top:4px;">${escape(order.address)}</div>` : ''}
+          </div>
+          <div class="order-cell">
+            <div class="table-strong">${escape(order.amount)}</div>
+            <div class="order-subtitle">${escape(new Date(order.timestamp).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }))}</div>
+          </div>
+          <div class="order-cell">
+            <span class="badge ${badgeClass(status)}">${escape(status)}</span>
+            <div class="order-subtitle" style="margin-top:8px;">Safe fallback UI for partial records</div>
+          </div>
+          <div class="order-cell">
+            <label class="visually-hidden">Update status for ${escape(order.orderId)}</label>
+            <select class="status-select">
+              <option value="pending"${status === 'pending' ? ' selected' : ''}>Pending</option>
+              <option value="confirmed"${status === 'confirmed' ? ' selected' : ''}>Confirmed</option>
+              <option value="completed"${status === 'completed' ? ' selected' : ''}>Completed</option>
+              <option value="cancelled"${status === 'cancelled' ? ' selected' : ''}>Cancelled</option>
+              <option value="paid"${status === 'paid' ? ' selected' : ''}>Paid</option>
+              <option value="unpaid"${status === 'unpaid' ? ' selected' : ''}>Unpaid</option>
+              <option value="collected"${status === 'collected' ? ' selected' : ''}>Collected</option>
+              <option value="delivered"${status === 'delivered' ? ' selected' : ''}>Delivered</option>
+            </select>
+          </div>
+          <div class="order-cell">
+            <button class="button" type="button">Save</button>
+          </div>
+        `;
+
+        const select = card.querySelector('select');
+        const button = card.querySelector('button');
+        button.addEventListener('click', () => saveStatus(order, select, button));
+        ordersContainer.appendChild(card);
+      });
+    }
+
+    orderSearch.addEventListener('input', renderOrders);
+    statusFilter.addEventListener('change', renderOrders);
+    document.getElementById('refreshOrders').addEventListener('click', fetchOrders);
+    document.getElementById('statusTabs').addEventListener('click', (event) => {
+      const chip = event.target.closest('[data-status]');
+      if (!chip) return;
+      activeTab = chip.dataset.status;
+      document.querySelectorAll('#statusTabs .chip').forEach((button) => button.classList.toggle('active', button === chip));
+      renderOrders();
+    });
+
+    fetchOrders();
+  </script>
+</body>
+</html>

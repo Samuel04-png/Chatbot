@@ -1,0 +1,17 @@
+{
+  "admin_create_accepts_fbscrypt_password_hash": true,
+  "app_metadata_preserved": true,
+  "stored_as_fbscrypt_before_login": true,
+  "wrong_password_rejected": true,
+  "original_firebase_password_signs_in": true,
+  "access_token_algorithm": "ES256",
+  "server_verifier_accepts_token": true,
+  "stored_hash_after_login": "fbscrypt (not rehashed)",
+  "password_works_on_second_sign_in": true,
+  "signed_out_token_rejected_by_session_check": true,
+  "jwt_signature_alone_still_accepts_signed_out_token": true,
+  "admin_create_accepts_custom_uuid_id": true,
+  "self_signup_creates_identity_only": true,
+  "password_recovery_email_requested": true,
+  "duplicate_email_create_refused": true
+}

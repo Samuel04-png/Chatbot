@@ -1,0 +1,171 @@
+{
+  "comparison_baseline": "docs/integration-readiness/evidence/source-manifest.json",
+  "note": "Explicit implementation paths plus existing baseline paths whose content differs; no git repository available. Evidence artifacts are listed separately to avoid recursive hashes.",
+  "files": [
+    {
+      "path": ".coveragerc",
+      "status": "new",
+      "sha256": "a04636f330ac733eb4900d9533cf7d46e845f734d6fe0cd45b13d092095be3d0"
+    },
+    {
+      "path": ".env.example",
+      "status": "modified",
+      "sha256": "2d8b1933e2bb5fa3b22b2eac4bb9951dbdd715186e475f3385bd9c624c4f4322"
+    },
+    {
+      "path": "README.md",
+      "status": "modified",
+      "sha256": "a8383d5636b5539357d4aadd4baff48f3b942258c810cd541e363d71fb05a0cb"
+    },
+    {
+      "path": "app.py",
+      "status": "modified",
+      "sha256": "82b0988d698819c73c44511d93ce7e0c7663e3425bcf6295fbc3498e7ee22390"
+    },
+    {
+      "path": "css/observer.css",
+      "status": "new",
+      "sha256": "4d7e91d74ffb2f8daa9e45c19d368755f78e83813a38acfddd3ee61e893540f9"
+    },
+    {
+      "path": "docs/LOCAL_IMPLEMENTATION.md",
+      "status": "modified",
+      "sha256": "9bcbf140aa057c218d43b7c15578e4aee429a65d42bbedd6943877456c14b7c5"
+    },
+    {
+      "path": "docs/integration-readiness/README.md",
+      "status": "modified",
+      "sha256": "425d7ad285b1fbdd2b0499ff42f7124fbec2c0411a431a0d4e66cb6d5cf50ed4"
+    },
+    {
+      "path": "docs/observer-implementation/README.md",
+      "status": "new",
+      "sha256": "42693b938b91e02cdba61398fa01e8bd52e3359c97795dcf2afa6d399c43270b"
+    },
+    {
+      "path": "docs/observer-implementation/ROLLOUT.md",
+      "status": "new",
+      "sha256": "e2948acf2071cfa03c11d9c6e8536278454faba10e165ef84e875332be626e83"
+    },
+    {
+      "path": "docs/observer-implementation/RUNBOOK.md",
+      "status": "new",
+      "sha256": "c5793212344395c02fc1bf5ff79059e76e925204ec476f7f474f3254e5f139e6"
+    },
+    {
+      "path": "docs/observer-implementation/TEST_RESULTS.md",
+      "status": "new",
+      "sha256": "3c92a212898c434db7caa771a5cdd8396aa3766c91aa33773ba6aa3bb74a3034"
+    },
+    {
+      "path": "js/observer-demo-auth.js",
+      "status": "new",
+      "sha256": "f6ef134e59052d8e8c22cd7101f7d233ff09242b84d37921c453c1db5fab5156"
+    },
+    {
+      "path": "js/observer.js",
+      "status": "new",
+      "sha256": "fa641b038dc174a5b56d2645f4f35a2bdefb418e08a940be47213d2024ea4093"
+    },
+    {
+      "path": "js/rudo-api.js",
+      "status": "modified",
+      "sha256": "13d4a5d85f58678bda5c3067113c45e117b4037863d42e621b6aa5f047bc5967"
+    },
+    {
+      "path": "js/rudo-auth.js",
+      "status": "modified",
+      "sha256": "f1f50d29ffd307db5c3bd9535acdd59c016a6dba2bd4e749e7409cd272ccf5c6"
+    },
+    {
+      "path": "observer.html",
+      "status": "new",
+      "sha256": "8bb0876cc284389593138b77a46d9459d224266268e3e786e4384e87bf8c0793"
+    },
+    {
+      "path": "rudo/observer.py",
+      "status": "new",
+      "sha256": "e61c00d67fd5b5353b8eb2a94d5c4a5a00757f15da8f5d1fe64a843c35b097c9"
+    },
+    {
+      "path": "rudo/observer_api.py",
+      "status": "new",
+      "sha256": "6db79aecbb099481a6b0a87835d3212442da3caf88a151d7dd155149d810d169"
+    },
+    {
+      "path": "rudo/synthetic.py",
+      "status": "new",
+      "sha256": "33eac940d5787140cbef7e173d7dd89e04b0872f2a6b2f73b9c220982607dd96"
+    },
+    {
+      "path": "scripts/bootstrap_observer.py",
+      "status": "new",
+      "sha256": "e6dd6924f904a07214f090593aebf6fcc3e3949a91077d5adcd413d1faacc4e9"
+    },
+    {
+      "path": "scripts/run_observer_demo.py",
+      "status": "new",
+      "sha256": "b8f7a0f7e0fff18a2f38ac3229717f70e90ea023ca7218c9639da58385157091"
+    },
+    {
+      "path": "scripts/test_local.sh",
+      "status": "new",
+      "sha256": "c461adbd873f5023d72cc348eb859fa086983f7ea40f723e8d7d6e658fd6efe6"
+    },
+    {
+      "path": "scripts/test_observer_browser.mjs",
+      "status": "new",
+      "sha256": "667bb2e664fdbbd8cc28c9e1a0d97c6d5ff7544bf3deb6ca2efb8d7f58b49656"
+    },
+    {
+      "path": "staging/observer/control.sql",
+      "status": "new",
+      "sha256": "4cde4d729bf7e51eb09fe657bf10acc6fcf60e77e70545ba8d056e5f8d5d53b4"
+    },
+    {
+      "path": "staging/observer/source_fixture.sql",
+      "status": "new",
+      "sha256": "db7114e0a8cfe8a499810df67c85c5c4d207459fcde82f331e28e09138844656"
+    },
+    {
+      "path": "tests/conftest.py",
+      "status": "modified",
+      "sha256": "a7aad7cbee510dac38b3ff328672af60f1653d25f1e0a6b0f9d9e82fa6fa1b72"
+    },
+    {
+      "path": "tests/fixtures/CANDIDATE_LICENSE.txt",
+      "status": "new",
+      "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0"
+    },
+    {
+      "path": "tests/fixtures/candidate_contract.py",
+      "status": "new",
+      "sha256": "d6edd7c30312bdc4dbf02d9a036e46b40ee8f166e1b3fca112276836b7b1fd1d"
+    },
+    {
+      "path": "tests/fixtures/candidate_provenance.json",
+      "status": "new",
+      "sha256": "92d1e6eb69eea8c60a28f581769484a79e2970d3bdd849d053d7817c2c3394b9"
+    },
+    {
+      "path": "tests/test_candidate_observer.py",
+      "status": "new",
+      "sha256": "b6b6fa941ded19a3afedf1a55c6cf2388930ca436c0b478c8c96cbbd55a272c9"
+    },
+    {
+      "path": "tests/test_deferred_transport.py",
+      "status": "new",
+      "sha256": "1a8abd4508d0d12aa7777c4802cb76c560750b72258dfd66b48a78a41e42b821"
+    },
+    {
+      "path": "tests/test_observer.py",
+      "status": "new",
+      "sha256": "da809cf83df76b1c2b83be4ddde7592e0370b6fe7b55a454c91d5797aeb579b8"
+    },
+    {
+      "path": "tests/test_observer_browser.py",
+      "status": "new",
+      "sha256": "0571451389123ec86f532bf4fbda5b913edd2bd20a1d9d91913067cc0bd3a9be"
+    }
+  ]
+}

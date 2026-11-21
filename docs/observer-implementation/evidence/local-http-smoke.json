@@ -1,0 +1,19 @@
+{
+  "scope": "loopback synthetic demo",
+  "result": {
+    "conversations": 3,
+    "orders": 1,
+    "referrals": 1,
+    "analytics": {
+      "captured_messages": 4,
+      "conversations": 3,
+      "orders": 1,
+      "referrals": 1,
+      "source_users": 2
+    }
+  },
+  "no_real_firebase_sdk": true,
+  "anonymous_denied": true,
+  "mutation_denied": true,
+  "source_snapshot_unchanged": true
+}

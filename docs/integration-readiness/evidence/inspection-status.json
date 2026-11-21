@@ -1,0 +1,13 @@
+{
+  "probe_exit_code": 0,
+  "sanitized_diagnostic": "Initialising login role...\n",
+  "method": "BEGIN READ ONLY; SELECT server_version; ROLLBACK",
+  "project_ref": "cktfbpnxpfbyroqzuibc",
+  "full_metadata_completed": true,
+  "exact_counts_queried": false,
+  "application_rows_queried": false,
+  "function_bodies_queried": false,
+  "trigger_arguments_queried": false,
+  "application_schema_ddl_requested": false,
+  "messaging_or_model_calls_made": false
+}

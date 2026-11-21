@@ -1,0 +1,1616 @@
+{
+  "columns": [
+    {
+      "column": "key",
+      "default_expression": null,
+      "generated": "",
+      "identity": "",
+      "not_null": true,
+      "schema": "public",
+      "table": "kv",
+      "type": "text"
+    },
+    {
+      "column": "value",
+      "default_expression": null,
+      "generated": "",
+      "identity": "",
+      "not_null": true,
+      "schema": "public",
+      "table": "kv",
+      "type": "text"
+    },
+    {
+      "column": "expires_at",
+      "default_expression": null,
+      "generated": "",
+      "identity": "",
+      "not_null": false,
+      "schema": "public",
+      "table": "kv",
+      "type": "timestamp with time zone"
+    },
+    {
+      "column": "id",
+      "default_expression": null,
+      "generated": "",
+      "identity": "d",
+      "not_null": true,
+      "schema": "public",
+      "table": "messages",
+      "type": "bigint"
+    },
+    {
+      "column": "phone",
+      "default_expression": null,
+      "generated": "",
+      "identity": "",
+      "not_null": true,
+      "schema": "public",
+      "table": "messages",
+      "type": "text"
+    },
+    {
+      "column": "role",
+      "default_expression": null,
+      "generated": "",
+      "identity": "",
+      "not_null": true,
+      "schema": "public",
+      "table": "messages",
+      "type": "text"
+    },
+    {
+      "column": "message",
+      "default_expression": null,
+      "generated": "",
+      "identity": "",
+      "not_null": true,
+      "schema": "public",
+      "table": "messages",
+      "type": "text"
+    },
+    {
+      "column": "message_en",
+      "default_expression": null,
+      "generated": "",
+      "identity": "",
+      "not_null": false,
+      "schema": "public",
+      "table": "messages",
+      "type": "text"
+    },
+    {
+      "column": "created_at",
+      "default_expression": "now()",
+      "generated": "",
+      "identity": "",
+      "not_null": true,
+      "schema": "public",
+      "table": "messages",
+      "type": "timestamp with time zone"
+    },
+    {
+      "column": "id",
+      "default_expression": null,
+      "generated": "",
+      "identity": "a",
+      "not_null": true,
+      "schema": "public",
+      "table": "orders",
+      "type": "bigint"
+    },
+    {
+      "column": "phone",
+      "default_expression": null,
+      "generated": "",
+      "identity": "",
+      "not_null": true,
+      "schema": "public",
+      "table": "orders",
+      "type": "text"
+    },
+    {
+      "column": "user_id",
+      "default_expression": null,
+      "generated": "",
+      "identity": "",
+      "not_null": false,
+      "schema": "public",
+      "table": "orders",
+      "type": "text"
+    },
+    {
+      "column": "product",
+      "default_expression": null,
+      "generated": "",
+      "identity": "",
+      "not_null": true,
+      "schema": "public",
+      "table": "orders",
+      "type": "text"
+    },
+    {
+      "column": "price",
+      "default_expression": null,
+      "generated": "",
+      "identity": "",
+      "not_null": false,
+      "schema": "public",
+      "table": "orders",
+      "type": "text"
+    },
+    {
+      "column": "quantity",
+      "default_expression": null,
+      "generated": "",
+      "identity": "",
+      "not_null": true,
+      "schema": "public",
+      "table": "orders",
+      "type": "integer"
+    },
+    {
+      "column": "address",
+      "default_expression": null,
+      "generated": "",
+      "identity": "",
+      "not_null": false,
+      "schema": "public",
+      "table": "orders",
+      "type": "text"
+    },
+    {
+      "column": "status",
+      "default_expression": "'pending'::text",
+      "generated": "",
+      "identity": "",
+      "not_null": true,
+      "schema": "public",
+      "table": "orders",
+      "type": "text"
+    },
+    {
+      "column": "created_at",
+      "default_expression": "now()",
+      "generated": "",
+      "identity": "",
+      "not_null": true,
+      "schema": "public",
+      "table": "orders",
+      "type": "timestamp with time zone"
+    },
+    {
+      "column": "id",
+      "default_expression": null,
+      "generated": "",
+      "identity": "a",
+      "not_null": true,
+      "schema": "public",
+      "table": "referrals",
+      "type": "bigint"
+    },
+    {
+      "column": "phone",
+      "default_expression": null,
+      "generated": "",
+      "identity": "",
+      "not_null": true,
+      "schema": "public",
+      "table": "referrals",
+      "type": "text"
+    },
+    {
+      "column": "source",
+      "default_expression": null,
+      "generated": "",
+      "identity": "",
+      "not_null": true,
+      "schema": "public",
+      "table": "referrals",
+      "type": "text"
+    },
+    {
+      "column": "user_id",
+      "default_expression": null,
+      "generated": "",
+      "identity": "",
+      "not_null": false,
+      "schema": "public",
+      "table": "referrals",
+      "type": "text"
+    },
+    {
+      "column": "created_at",
+      "default_expression": "now()",
+      "generated": "",
+      "identity": "",
+      "not_null": true,
+      "schema": "public",
+      "table": "referrals",
+      "type": "timestamp with time zone"
+    },
+    {
+      "column": "step",
+      "default_expression": null,
+      "generated": "",
+      "identity": "",
+      "not_null": false,
+      "schema": "public",
+      "table": "user_state",
+      "type": "json"
+    },
+    {
+      "column": "language",
+      "default_expression": null,
+      "generated": "",
+      "identity": "",
+      "not_null": false,
+      "schema": "public",
+      "table": "user_state",
+      "type": "json"
+    },
+    {
+      "column": "registered",
+      "default_expression": null,
+      "generated": "",
+      "identity": "",
+      "not_null": false,
+      "schema": "public",
+      "table": "user_state",
+      "type": "boolean"
+    },
+    {
+      "column": "phone_digits",
+      "default_expression": null,
+      "generated": "",
+      "identity": "",
+      "not_null": false,
+      "schema": "public",
+      "table": "user_state",
+      "type": "character varying"
+    },
+    {
+      "column": "user_id",
+      "default_expression": null,
+      "generated": "",
+      "identity": "",
+      "not_null": true,
+      "schema": "public",
+      "table": "user_state",
+      "type": "character varying"
+    },
+    {
+      "column": "topic",
+      "default_expression": null,
+      "generated": "",
+      "identity": "",
+      "not_null": false,
+      "schema": "public",
+      "table": "user_state",
+      "type": "json"
+    },
+    {
+      "column": "needs_language_confirmation",
+      "default_expression": null,
+      "generated": "",
+      "identity": "",
+      "not_null": false,
+      "schema": "public",
+      "table": "user_state",
+      "type": "boolean"
+    },
+    {
+      "column": "first_message",
+      "default_expression": null,
+      "generated": "",
+      "identity": "",
+      "not_null": false,
+      "schema": "public",
+      "table": "user_state",
+      "type": "boolean"
+    },
+    {
+      "column": "phone",
+      "default_expression": null,
+      "generated": "",
+      "identity": "",
+      "not_null": true,
+      "schema": "public",
+      "table": "users",
+      "type": "text"
+    },
+    {
+      "column": "user_id",
+      "default_expression": null,
+      "generated": "",
+      "identity": "",
+      "not_null": false,
+      "schema": "public",
+      "table": "users",
+      "type": "text"
+    },
+    {
+      "column": "language",
+      "default_expression": null,
+      "generated": "",
+      "identity": "",
+      "not_null": false,
+      "schema": "public",
+      "table": "users",
+      "type": "text"
+    },
+    {
+      "column": "step",
+      "default_expression": null,
+      "generated": "",
+      "identity": "",
+      "not_null": false,
+      "schema": "public",
+      "table": "users",
+      "type": "text"
+    },
+    {
+      "column": "state",
+      "default_expression": "'{}'::jsonb",
+      "generated": "",
+      "identity": "",
+      "not_null": true,
+      "schema": "public",
+      "table": "users",
+      "type": "jsonb"
+    },
+    {
+      "column": "created_at",
+      "default_expression": "now()",
+      "generated": "",
+      "identity": "",
+      "not_null": true,
+      "schema": "public",
+      "table": "users",
+      "type": "timestamp with time zone"
+    },
+    {
+      "column": "updated_at",
+      "default_expression": "now()",
+      "generated": "",
+      "identity": "",
+      "not_null": true,
+      "schema": "public",
+      "table": "users",
+      "type": "timestamp with time zone"
+    }
+  ],
+  "constraints": [
+    {
+      "definition": "PRIMARY KEY (key)",
+      "name": "kv_pkey",
+      "schema": "public",
+      "table": "kv",
+      "type": "p"
+    },
+    {
+      "definition": "PRIMARY KEY (id)",
+      "name": "messages_pkey",
+      "schema": "public",
+      "table": "messages",
+      "type": "p"
+    },
+    {
+      "definition": "CHECK ((role = ANY (ARRAY['user'::text, 'bot'::text])))",
+      "name": "messages_role_check",
+      "schema": "public",
+      "table": "messages",
+      "type": "c"
+    },
+    {
+      "definition": "PRIMARY KEY (id)",
+      "name": "orders_pkey1",
+      "schema": "public",
+      "table": "orders",
+      "type": "p"
+    },
+    {
+      "definition": "PRIMARY KEY (id)",
+      "name": "referrals_pkey1",
+      "schema": "public",
+      "table": "referrals",
+      "type": "p"
+    },
+    {
+      "definition": "PRIMARY KEY (user_id)",
+      "name": "user_state_pkey",
+      "schema": "public",
+      "table": "user_state",
+      "type": "p"
+    },
+    {
+      "definition": "PRIMARY KEY (phone)",
+      "name": "users_pkey",
+      "schema": "public",
+      "table": "users",
+      "type": "p"
+    }
+  ],
+  "functions": [],
+  "grants": [
+    {
+      "grantee": "anon",
+      "privilege": "DELETE",
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "INSERT",
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "REFERENCES",
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "SELECT",
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "TRIGGER",
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "TRUNCATE",
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "UPDATE",
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "DELETE",
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "INSERT",
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "REFERENCES",
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "SELECT",
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "TRIGGER",
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "TRUNCATE",
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "UPDATE",
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "DELETE",
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "INSERT",
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "REFERENCES",
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "SELECT",
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "TRIGGER",
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "TRUNCATE",
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "UPDATE",
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "DELETE",
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "INSERT",
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "REFERENCES",
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "SELECT",
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "TRIGGER",
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "TRUNCATE",
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "UPDATE",
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "DELETE",
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "INSERT",
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "REFERENCES",
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "SELECT",
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "TRIGGER",
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "TRUNCATE",
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "UPDATE",
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "DELETE",
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "INSERT",
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "REFERENCES",
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "SELECT",
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "TRIGGER",
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "TRUNCATE",
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "UPDATE",
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "DELETE",
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "INSERT",
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "REFERENCES",
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "SELECT",
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "TRIGGER",
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "TRUNCATE",
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "UPDATE",
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "DELETE",
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "INSERT",
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "REFERENCES",
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "SELECT",
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "TRIGGER",
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "TRUNCATE",
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "UPDATE",
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "DELETE",
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "INSERT",
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "REFERENCES",
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "SELECT",
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "TRIGGER",
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "TRUNCATE",
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "UPDATE",
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "DELETE",
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "INSERT",
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "REFERENCES",
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "SELECT",
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "TRIGGER",
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "TRUNCATE",
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "UPDATE",
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "DELETE",
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "INSERT",
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "REFERENCES",
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "SELECT",
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "TRIGGER",
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "TRUNCATE",
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "UPDATE",
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "DELETE",
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "INSERT",
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "REFERENCES",
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "SELECT",
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "TRIGGER",
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "TRUNCATE",
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "UPDATE",
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "DELETE",
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "INSERT",
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "REFERENCES",
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "SELECT",
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "TRIGGER",
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "TRUNCATE",
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "UPDATE",
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "DELETE",
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "INSERT",
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "REFERENCES",
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "SELECT",
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "TRIGGER",
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "TRUNCATE",
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "UPDATE",
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "DELETE",
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "INSERT",
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "REFERENCES",
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "SELECT",
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "TRIGGER",
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "TRUNCATE",
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "UPDATE",
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "DELETE",
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "INSERT",
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "REFERENCES",
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "SELECT",
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "TRIGGER",
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "TRUNCATE",
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "UPDATE",
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "DELETE",
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "INSERT",
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "REFERENCES",
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "SELECT",
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "TRIGGER",
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "TRUNCATE",
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "UPDATE",
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "DELETE",
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "INSERT",
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "REFERENCES",
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "SELECT",
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "TRIGGER",
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "TRUNCATE",
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "UPDATE",
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "DELETE",
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "INSERT",
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "REFERENCES",
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "SELECT",
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "TRIGGER",
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "TRUNCATE",
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "UPDATE",
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "DELETE",
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "INSERT",
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "REFERENCES",
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "SELECT",
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "TRIGGER",
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "TRUNCATE",
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "UPDATE",
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "DELETE",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "INSERT",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "REFERENCES",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "SELECT",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "TRIGGER",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "TRUNCATE",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "UPDATE",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "DELETE",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "INSERT",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "REFERENCES",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "SELECT",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "TRIGGER",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "TRUNCATE",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "UPDATE",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "DELETE",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "INSERT",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "REFERENCES",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "SELECT",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "TRIGGER",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "TRUNCATE",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "UPDATE",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "DELETE",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "INSERT",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "REFERENCES",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "SELECT",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "TRIGGER",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "TRUNCATE",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "UPDATE",
+      "schema": "public",
+      "table": "users"
+    }
+  ],
+  "indexes": [
+    {
+      "indexdef": "CREATE INDEX kv_expires_idx ON public.kv USING btree (expires_at) WHERE (expires_at IS NOT NULL)",
+      "indexname": "kv_expires_idx",
+      "schemaname": "public",
+      "tablename": "kv",
+      "tablespace": null
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX kv_pkey ON public.kv USING btree (key)",
+      "indexname": "kv_pkey",
+      "schemaname": "public",
+      "tablename": "kv",
+      "tablespace": null
+    },
+    {
+      "indexdef": "CREATE INDEX messages_phone_id_idx ON public.messages USING btree (phone, id DESC)",
+      "indexname": "messages_phone_id_idx",
+      "schemaname": "public",
+      "tablename": "messages",
+      "tablespace": null
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX messages_pkey ON public.messages USING btree (id)",
+      "indexname": "messages_pkey",
+      "schemaname": "public",
+      "tablename": "messages",
+      "tablespace": null
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX orders_pkey1 ON public.orders USING btree (id)",
+      "indexname": "orders_pkey1",
+      "schemaname": "public",
+      "tablename": "orders",
+      "tablespace": null
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX referrals_pkey1 ON public.referrals USING btree (id)",
+      "indexname": "referrals_pkey1",
+      "schemaname": "public",
+      "tablename": "referrals",
+      "tablespace": null
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX user_state_pkey ON public.user_state USING btree (user_id)",
+      "indexname": "user_state_pkey",
+      "schemaname": "public",
+      "tablename": "user_state",
+      "tablespace": null
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX users_pkey ON public.users USING btree (phone)",
+      "indexname": "users_pkey",
+      "schemaname": "public",
+      "tablename": "users",
+      "tablespace": null
+    }
+  ],
+  "migration_history_columns": [],
+  "migration_history_table": null,
+  "policies": [],
+  "runtime_roles": [],
+  "schema_grants": [
+    {
+      "grantee": "pg_database_owner",
+      "privilege": "USAGE",
+      "schema": "public"
+    },
+    {
+      "grantee": "pg_database_owner",
+      "privilege": "CREATE",
+      "schema": "public"
+    },
+    {
+      "grantee": "PUBLIC",
+      "privilege": "USAGE",
+      "schema": "public"
+    },
+    {
+      "grantee": "postgres",
+      "privilege": "USAGE",
+      "schema": "public"
+    },
+    {
+      "grantee": "anon",
+      "privilege": "USAGE",
+      "schema": "public"
+    },
+    {
+      "grantee": "authenticated",
+      "privilege": "USAGE",
+      "schema": "public"
+    },
+    {
+      "grantee": "service_role",
+      "privilege": "USAGE",
+      "schema": "public"
+    }
+  ],
+  "schemas": [
+    "auth",
+    "extensions",
+    "graphql",
+    "graphql_public",
+    "public",
+    "realtime",
+    "storage",
+    "vault"
+  ],
+  "server_version": "17.6",
+  "tables": [
+    {
+      "estimated_rows": -1,
+      "force_rls": false,
+      "kind": "r",
+      "owner": "postgres",
+      "rls": true,
+      "schema": "public",
+      "table": "kv"
+    },
+    {
+      "estimated_rows": 7834,
+      "force_rls": false,
+      "kind": "r",
+      "owner": "postgres",
+      "rls": true,
+      "schema": "public",
+      "table": "messages"
+    },
+    {
+      "estimated_rows": -1,
+      "force_rls": false,
+      "kind": "r",
+      "owner": "postgres",
+      "rls": true,
+      "schema": "public",
+      "table": "orders"
+    },
+    {
+      "estimated_rows": 1355,
+      "force_rls": false,
+      "kind": "r",
+      "owner": "postgres",
+      "rls": true,
+      "schema": "public",
+      "table": "referrals"
+    },
+    {
+      "estimated_rows": -1,
+      "force_rls": false,
+      "kind": "r",
+      "owner": "postgres",
+      "rls": true,
+      "schema": "public",
+      "table": "user_state"
+    },
+    {
+      "estimated_rows": 916,
+      "force_rls": false,
+      "kind": "r",
+      "owner": "postgres",
+      "rls": true,
+      "schema": "public",
+      "table": "users"
+    }
+  ],
+  "triggers": [],
+  "project_ref": "cktfbpnxpfbyroqzuibc",
+  "inspection_date": "2026-11-20",
+  "method": "BEGIN READ ONLY; catalog metadata SELECT; ROLLBACK"
+}

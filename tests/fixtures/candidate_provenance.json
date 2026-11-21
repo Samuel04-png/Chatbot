@@ -1,0 +1,17 @@
+{
+  "repository": "Samuel04-png/rudo_medgemma",
+  "commit": "af2545c92aea2cbcda5c6d717f67598b386a373d",
+  "functions": {
+    "main.py": [
+      "_split_for_whatsapp",
+      "send",
+      "save_user_conversation",
+      "_history_for_model"
+    ],
+    "medgemma_client.py": [
+      "pairs_from_history"
+    ]
+  },
+  "excerpt_sha256": "d6edd7c30312bdc4dbf02d9a036e46b40ee8f166e1b3fca112276836b7b1fd1d",
+  "comparison_scope": "source helper contracts only; deployed version and actual AI runtime UNVERIFIED"
+}

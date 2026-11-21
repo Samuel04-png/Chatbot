@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dawa Health — Orders</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Site favicon -->
+	<link rel="apple-touch-icon" sizes="180x180" href="img/logo.ico">
+	<link rel="icon" type="image/png" sizes="32x32" href="img/logo.ico">
+	<link rel="icon" type="image/png" sizes="16x16" href="img/logo.ico">
+
+  <style>
+    :root{
+      --bg:#f0f4f9;
+      --card:#ffffff;
+      --accent:#46c741;
+      --primary:#1127ab;
+      --muted:#e7edf6;
+      --text:#222132;
+      --border:#dce3ef;
+      font-family:Poppins, system-ui, -apple-system, 'Segoe UI', Roboto, Arial;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg); color:var(--text);display:flex;background-image:radial-gradient(circle at 12% 8%, rgba(17, 39, 171, 0.07), transparent 32%),radial-gradient(circle at 90% 4%, rgba(70, 199, 65, 0.08), transparent 28%),linear-gradient(180deg, #ffffff 0%, var(--bg) 48%);}
+
+    /* Sidebar - Responsive */
+    .sidebar{
+      width:240px; 
+      background:var(--card); 
+      border-right:1px solid var(--border); 
+      display:flex; 
+      flex-direction:column; 
+      padding:20px; 
+      height:100vh; 
+      position:sticky; 
+      top:0;
+      transition: transform 0.3s ease;
+      z-index: 100;
+    }
+    .brand{display:flex;gap:12px;align-items:center;margin-bottom:20px}
+    .logo{width:48px;height:48px;border-radius:12px;background:linear-gradient(100deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:700;color:white}
+    .brand h1{font-size:18px;margin:0}
+    .nav{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+    .nav a{color:var(--text);text-decoration:none;padding:10px;border-radius:8px}
+    .nav a:hover{background:var(--muted)}
+    .nav a.active{background:var(--primary);color:white}
+    
+    /* Mobile menu toggle */
+    .menu-toggle {
+      display: none;
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 101;
+      background: var(--primary);
+      border: none;
+      border-radius: 6px;
+      width: 40px;
+      height: 40px;
+      color: white;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .main{flex:1;overflow-y:auto}
+    .container{max-width:1200px;margin:28px auto;padding:20px;}
+    
+    /* Header - Responsive */
+    .header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap: wrap;
+    }
+    h1{margin:0; font-size: clamp(1.5rem, 4vw, 2rem);}
+    
+    .controls{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .search{
+      padding:8px 12px;
+      border-radius:8px;
+      border:1px solid #353042;
+      background:transparent;
+      color:var(--text);
+      min-width: 200px;
+      flex: 1;
+    }
+    .filter{
+      padding:8px 12px;
+      border-radius:8px;
+      border:1px solid #353042;
+      background:var(--accent);
+      color:var(--text);
+    }
+
+    /* Orders Grid - Responsive */
+    .orders{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(min(320px, 100%),1fr));
+      gap:16px;
+    }
+    .order-card{
+      background:var(--card);
+      border-radius:12px;
+      padding:12px;
+      border:1px solid #343041;
+      display: flex;
+      flex-direction: column;
+    }
+    .details{flex:1}
+    .meta{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-top:8px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .status-select{
+      padding:8px;
+      border-radius:8px;
+      border:1px solid #3a3546;
+      background:var(--primary);
+      color:var(--text);
+      width: 100%;
+      max-width: 150px;
+    }
+    .price{font-weight:700}
+    .field{margin-top:8px;font-size:14px}
+    .btn-small{
+      padding:6px 10px;
+      border-radius:6px;
+      border:0;
+      cursor:pointer;
+      font-size:13px;
+      font-weight:600;
+      white-space: nowrap;
+    }
+
+    .empty{padding:40px;border-radius:12px;text-align:center;color:#7b7a8b;background:rgba(255,255,255,0.02)}
+
+    .legend{
+      display:flex;
+      gap:10px;
+      margin-top:12px;
+      flex-wrap:wrap;
+    }
+    .legend .pill{
+      padding:6px 10px;
+      border-radius:8px;
+      background:#2a2640;
+      font-size: 14px;
+    }
+
+    .modal{
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      background:rgba(0,0,0,.8);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:1000;
+    }
+    .modal-content{
+      background:#fff;
+      padding:20px;
+      border-radius:12px;
+      max-width:90%;
+      max-height:90%;
+      overflow:auto;
+      color: var(--border);
+    }
+    .modal-content img{max-width:100%;height:auto;border-radius:8px}
+    .modal-close{
+      margin-top:10px;
+      padding:6px 12px;
+      background:var(--primary);
+      color:white;
+      border:0;
+      border-radius:6px;
+      cursor:pointer;
+    }
+    
+    /* Mobile-specific styles */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        position: fixed;
+        transform: translateX(-100%);
+        width: 280px;
+      }
+      
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      
+      .menu-toggle {
+        display: flex;
+      }
+      
+      .main {
+        width: 100%;
+      }
+      
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .controls {
+        width: 100%;
+      }
+      
+      .search, .filter {
+        width: 100%;
+        min-width: auto;
+      }
+      
+      .order-card .btns {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      
+      .meta {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .status-select {
+        max-width: 100%;
+      }
+    }
+
+    .logo-img {
+      width: 60px;      /* adjust size */
+      height: 60px;
+      object-fit: contain;
+    }
+    
+    @media (max-width: 480px) {
+      .container {
+        padding: 10px;
+      }
+      
+      .legend {
+        justify-content: center;
+      }
+      
+      .legend .pill {
+        font-size: 12px;
+        padding: 4px 8px;
+      }
+    }
+  </style>
+</head>
+<body><p role="alert">This separate commerce integration is disabled pending owner scope review. No database connection is configured.</p>
+  <button class="menu-toggle" id="menuToggle">☰</button>
+  
+  <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">
+          <img src="img/logo.png" alt="" class="logo-img">
+        </div>
+
+        <div>
+          <h1 style="color: #fff;">Dawa Health</h1>
+          <div style="font-size:12px; color:white">Admin Dashboard</div>
+        </div>
+      </div>
+
+
+      <nav class="nav">
+        <a href="chats.html" >Chats</a>
+        <a href="analytics.html" >Analytics</a>
+        <a href="cake_orders.html" class="active">Orders</a>
+        <a href="index.html">Dashboard</a>
+      </nav>
+  </aside>
+
+  <div class="main">
+    <div class="container">
+      <div class="header">
+        <div>
+          <h1>Orders</h1>
+          <div style="font-size:13px;color:#cfc1e9">Manage incoming Orders and update statuses</div>
+        </div>
+        <div class="controls">
+          <input id="search" class="search" placeholder="Search by customer, phone, or order id" />
+          <select id="statusFilter" class="filter">
+            <option value="all">All statuses</option>
+            <option value="pending">Pending</option>
+            <option value="paid">Paid</option>
+            <option value="unpaid">Unpaid</option>
+            <option value="collected">Collected</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+          <button id="refresh" style="padding:8px 12px;border-radius:8px;background:var(--primary);border:0;color:white;cursor:pointer">Refresh</button>
+        </div>
+      </div>
+
+      <div class="legend">
+        <div class="pill">Total Orders: <span id="totalCount">0</span></div>
+        <div class="pill">Paid: <span id="paidCount">0</span></div>
+        <div class="pill">Unpaid: <span id="unpaidCount">0</span></div>
+        <div class="pill">Collected: <span id="collectedCount">0</span></div>
+        <div class="pill">Delivered: <span id="deliveredCount">0</span></div>
+        <div class="pill">Pending: <span id="pendingCount">0</span></div>
+        <div class="pill">Cancelled: <span id="cancelledCount">0</span></div>
+      </div>
+
+      <div class="orders" id="ordersContainer"></div>
+      <template id="orderTpl">
+        <div class="order-card" data-orderid="{{id}}">
+          <div class="details">
+            <div style="display:flex;justify-content:space-between;align-items:start">
+              <div>
+                <div style="font-weight:700">Order #<span class="oid">{{id}}</span> — <span class="customer">{{customer}}</span></div>
+                <div style="font-size:13px;color:#cfc1e9">Phone: <span class="phone">{{phone}}</span></div>
+              </div>
+              <div style="text-align:right">
+                <div class="price">{{price}}</div>
+                <div style="font-size:12px;color:#bfa7e6">{{date}}</div>
+              </div>
+            </div>
+
+            <div class="field">Payment Method: <strong class="payment">{{payment}}</strong></div>
+            <div class="field">Colors: <span class="colors">{{colors}}</span></div>
+            <div class="field">Flavors: <span class="flavors">{{flavors}}</span></div>
+            <div class="field due">
+              {{dueLine}}
+            </div>
+
+
+            <div class="field btns">
+              {{designBtn}}
+              {{proofBtn}}
+            </div>
+
+            <div class="meta">
+              <div>
+                <select class="status-select">
+                  <option value="pending">Pending</option>
+                  <option value="paid">Paid</option>
+                  <option value="unpaid">Unpaid</option>
+                  <option value="collected">Collected</option>
+                  <option value="delivered">Delivered</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+              <div>
+                <button class="saveStatus btn-small" style="background:var(--accent);color:#1c1026;">Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+      <div id="empty" class="empty" style="display:none">No orders match your filter.</div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <div id="modalBody"></div>
+      <button class="modal-close">Close</button>
+    </div>
+  </div>
+
+
+
+</body>
+</html>

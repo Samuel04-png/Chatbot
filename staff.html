@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rudo · Staff management</title><link rel="icon" href="img/logo.ico"><link rel="stylesheet" href="css/observer.css"><link rel="stylesheet" href="css/staff.css">
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+<script defer src="js/rudo-auth.js"></script><script defer src="js/rudo-api.js"></script><script defer src="js/staff-admin.js"></script>
+</head><body data-environment="configured-source">
+<header><a class="brand" href="observer.html">Rudo <span>Staff workspace</span></a><div><span class="badge">Admin</span> <button id="logout" type="button">Sign out</button></div></header>
+<div class="shell"><aside><nav aria-label="Workspace"><a href="observer.html#conversations">Conversations</a><a href="observer.html#orders">Orders</a><a href="observer.html#referrals">Referrals</a><a href="observer.html#analytics">Analytics</a><a href="staff.html" class="active">Staff</a></nav><p id="identity">Verifying staff identity…</p><p class="subtle">Signing up never grants access. An admin invites an email with a role and facilities, the person signs in once, then the admin approves that verified sign-in.</p></aside>
+<main><div class="heading"><h1>Staff management</h1><button id="refresh" type="button">Refresh</button></div>
+<p id="page-state" role="status" aria-live="polite">Loading staff…</p>
+<div id="admin" hidden>
+<section class="panel"><h2>Pending sign-ins</h2><p class="subtle-dark">Verified sign-ins without staff access. Approve only when it matches a pending invitation for the same email.</p><div id="requests"></div></section>
+<section class="panel"><h2>Invite staff</h2>
+<form id="invite"><label>Email<input id="invite-email" type="email" required maxlength="254" autocomplete="off"></label>
+<label>Role<select id="invite-role"><option value="operator">Operator: conversations, orders, referrals</option><option value="analyst">Analyst: aggregate analytics only</option><option value="admin">Admin: everything + staff management</option></select></label>
+<fieldset><legend>Facilities</legend><div id="invite-facilities" class="checks"></div></fieldset>
+<button type="submit" class="primary">Create invitation</button></form>
+<div id="invitations"></div></section>
+<section class="panel"><h2>Staff</h2><div id="staff"></div></section>
+<section class="panel"><h2>Recent administrative activity</h2><ol id="events" class="events"></ol></section>
+</div></main></div>
+</body></html>

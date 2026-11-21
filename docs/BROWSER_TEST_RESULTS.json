@@ -1,0 +1,13 @@
+{
+  "passed": 7,
+  "checks": [
+    "chat load and queued send",
+    "persisted resolution",
+    "order update",
+    "dashboard metrics",
+    "analytics and referrals",
+    "no page errors or privileged provider calls",
+    "forged session denied before data requests"
+  ],
+  "pageErrors": []
+}

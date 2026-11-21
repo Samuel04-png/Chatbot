@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dawa Health | Settings</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="img/logo.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/logo.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="img/logo.ico">
+  <link rel="stylesheet" href="css/admin-light.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body class="dashboard-body">
+  <div class="mobile-topbar">
+    <button class="icon-button" type="button" data-sidebar-toggle aria-label="Open navigation" aria-expanded="false">Menu</button>
+    <strong>Settings</strong>
+    <span class="badge badge-accent">Account</span>
+  </div>
+  <div class="mobile-nav-backdrop" data-sidebar-backdrop></div>
+  <div class="app-shell">
+    <aside class="sidebar" data-sidebar>
+      <div class="sidebar-top">
+        <div class="brand">
+          <div class="brand-mark">
+            <img src="img/logo.png" alt="Dawa Health logo" onerror="this.style.display='none'; this.parentNode.textContent='DH';">
+          </div>
+          <div class="brand-copy">
+            <h1>Dawa Health</h1>
+            <p>Rudo Admin</p>
+          </div>
+        </div>
+        <div class="badge-row">
+          <span class="badge badge-success"><span class="status-dot"></span>Workspace online</span>
+        </div>
+        <section class="sidebar-card">
+          <div class="stat-value">0</div>
+          <div class="stat-label">Live conversations connected to this workspace.</div>
+        </section>
+       <nav class="nav" aria-label="Primary">
+          <a class="nav-link" href="index2.html" data-nav="dashboard" data-close-sidebar><span class="nav-icon"><i class="fa fa-home" aria-hidden="true"></i></span><span>Dashboard</span></a>
+          <a class="nav-link" href="chats.html" data-nav="chats" data-close-sidebar><span class="nav-icon"><i class="fa fa-commenting" aria-hidden="true"></i></span><span>Chats</span></a>
+          <a class="nav-link" href="analytics.html" data-nav="analytics" data-close-sidebar><span class="nav-icon"><i class="fa fa-line-chart" aria-hidden="true"></i></span><span>Analytics</span></a>
+          <a class="nav-link" href="orders.html" data-nav="orders" data-close-sidebar><span class="nav-icon"><i class="fa fa-list" aria-hidden="true"></i></span><span>Orders</span></a>
+          <a class="nav-link" href="profile.html" data-nav="profile" data-close-sidebar><span class="nav-icon"><i class="fa fa-user" aria-hidden="true"></i></span><span>Profile</span></a>
+          <a class="nav-link" href="settings.html" data-nav="settings" data-close-sidebar><span class="nav-icon"><i class="fa fa-cog" aria-hidden="true"></i></span><span>Settings</span></a>
+        </nav>
+      </div>
+      <form class="sidebar-card sidebar-form">
+        <label for="sidebarStartNumber">Start direct WhatsApp thread</label>
+        <input class="control" id="sidebarStartNumber" inputmode="tel" placeholder="e.g. 263771234567" aria-describedby="sidebarStartHelp">
+        <div class="meta-text" id="sidebarStartHelp">Use country code. Continue in Chats to start the thread.</div>
+        <button class="button" type="button" onclick="window.location.href='chats.html'">Start New Chat</button>
+      </form>
+    </aside>
+
+    <main class="panel page-panel">
+      <header class="panel-header sticky">
+        <div class="conversation-header">
+          <div class="header-copy">
+            <p class="eyebrow">Account</p>
+            <h2 class="panel-title">Settings</h2>
+            <p class="panel-subtitle">Manage account preferences, profile access, session controls, and safe account deletion.</p>
+          </div>
+          <div class="header-actions">
+            <a class="ghost-button" href="profile.html" style="text-decoration:none;">View profile</a>
+          </div>
+        </div>
+      </header>
+
+      <div class="page-scroll">
+        <div class="content-stack">
+          <section class="settings-hero">
+            <div>
+              <p class="eyebrow">Workspace account</p>
+              <h1>Account settings</h1>
+              <p>Everything the client asked to surface is now here: profile, account settings, logout, and safe delete account.</p>
+            </div>
+            <div class="profile-quick-actions">
+              <a class="button" href="profile.html" style="text-decoration:none;">Open profile</a>
+              <button class="ghost-button" type="button" id="logoutHero">Logout</button>
+            </div>
+          </section>
+
+          <form id="settingsForm" class="profile-grid" novalidate>
+            <section class="profile-card">
+              <div class="profile-card-heading">
+                <div>
+                  <p class="eyebrow">Identity</p>
+                  <h3>Account information</h3>
+                </div>
+              </div>
+              <dl class="detail-list">
+                <div><dt>Name</dt><dd id="settingsName">Loading...</dd></div>
+                <div><dt>Email</dt><dd id="settingsEmail">Loading...</dd></div>
+                <div><dt>Role</dt><dd id="settingsRole">Admin</dd></div>
+              </dl>
+              <a class="ghost-button settings-full-button" href="profile.html">Edit profile details</a>
+            </section>
+
+            <section class="profile-card">
+              <div class="profile-card-heading">
+                <div>
+                  <p class="eyebrow">Preferences</p>
+                  <h3>Dashboard preferences</h3>
+                </div>
+              </div>
+              <div class="profile-fields">
+                <label class="profile-field">Default landing page
+                  <select class="control" id="defaultLanding">
+                    <option value="index2.html">Dashboard</option>
+                    <option value="chats.html">Chats</option>
+                    <option value="analytics.html">Analytics</option>
+                    <option value="orders.html">Orders</option>
+                  </select>
+                </label>
+                <label class="profile-field">Refresh behavior
+                  <select class="control" id="refreshPreference">
+                    <option value="manual">Manual refresh</option>
+                    <option value="balanced">Balanced auto refresh</option>
+                    <option value="frequent">Frequent auto refresh</option>
+                  </select>
+                </label>
+              </div>
+            </section>
+
+            <section class="profile-card profile-card-wide">
+              <div class="profile-card-heading">
+                <div>
+                  <p class="eyebrow">Security</p>
+                  <h3>Session controls</h3>
+                </div>
+              </div>
+              <div class="settings-action-grid">
+                <article>
+                  <strong>Logout</strong>
+                  <p>Clear the current session and return to the sign-in page.</p>
+                  <button class="ghost-button" type="button" id="logoutCard">Logout now</button>
+                </article>
+                <article>
+                  <strong>Password reset</strong>
+                  <p>Use the recovery screen if you need a fresh password reset email.</p>
+                  <a class="ghost-button" href="forgot-password.html">Reset password</a>
+                </article>
+              </div>
+            </section>
+
+            <section class="profile-card danger-card profile-card-wide">
+              <div class="profile-card-heading">
+                <div>
+                  <p class="eyebrow danger">Danger zone</p>
+                  <h3>Delete account</h3>
+                </div>
+                <span class="badge badge-danger">Confirmation required</span>
+              </div>
+              <p>Deleting is never one click. Rudo asks for typed confirmation, clears local account data, and asks Firebase to delete the signed-in user when possible.</p>
+              <button class="ghost-button danger" type="button" id="deleteAccountSettings">Delete account</button>
+            </section>
+
+            <section class="profile-save-bar profile-card-wide">
+              <div>
+                <strong>Save preferences</strong>
+                <span id="settingsSaveMessage" class="meta-text">Preferences are stored locally for this browser.</span>
+              </div>
+              <button class="button" type="submit" id="saveSettingsButton">Save settings</button>
+            </section>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+  <script src="js/rudo-auth.js"></script>
+  <script src="js/rudo-api.js"></script>
+  <script src="js/admin-shell.js"></script>
+  <script>
+    AdminShell.setupShell('settings');
+
+    const SETTINGS_KEY = 'rudoAccountSettings';
+    const settingsForm = document.getElementById('settingsForm');
+    const saveButton = document.getElementById('saveSettingsButton');
+    const saveMessage = document.getElementById('settingsSaveMessage');
+
+    function loadSettings() {
+      try {
+        return JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+      } catch (error) {
+        return {};
+      }
+    }
+
+    function renderSettings() {
+      const profile = RudoAuth.getProfile();
+      const settings = loadSettings();
+      document.getElementById('settingsName').textContent = profile.name;
+      document.getElementById('settingsEmail').textContent = profile.email;
+      document.getElementById('settingsRole').textContent = profile.role || 'Admin';
+      document.getElementById('defaultLanding').value = settings.defaultLanding || 'index2.html';
+      document.getElementById('refreshPreference').value = settings.refreshPreference || 'manual';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderSettings();
+      RudoAuth.authReady().then(renderSettings);
+    });
+
+    settingsForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      RudoAuth.setButtonLoading(saveButton, true, 'Saving...');
+      const settings = {
+        defaultLanding: document.getElementById('defaultLanding').value,
+        refreshPreference: document.getElementById('refreshPreference').value,
+        updatedAt: new Date().toISOString()
+      };
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+      saveMessage.textContent = 'Settings saved successfully.';
+      RudoAuth.setButtonLoading(saveButton, false);
+    });
+
+    document.getElementById('logoutHero').addEventListener('click', () => RudoAuth.signOut('login.html'));
+    document.getElementById('logoutCard').addEventListener('click', () => RudoAuth.signOut('login.html'));
+    document.getElementById('deleteAccountSettings').addEventListener('click', () => AdminShell.openDeleteModal());
+  </script>
+</body>
+</html>

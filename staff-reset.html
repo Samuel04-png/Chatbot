@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rudo · Password recovery</title><link rel="icon" href="img/logo.ico"><link rel="stylesheet" href="css/staff-auth.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script defer src="js/rudo-supabase-auth.js"></script><script defer src="js/staff-auth-pages.js"></script>
+</head><body data-page="reset">
+<main class="card">
+  <p class="brand">Rudo <span>Staff workspace</span></p>
+  <h1 id="title">Reset your password</h1>
+  <p id="state" role="status" aria-live="polite">Checking sign-in configuration…</p>
+  <form id="reset-request" hidden>
+    <label>Email<input id="reset-email" type="email" autocomplete="username" required maxlength="254"></label>
+    <button type="submit" class="primary">Send reset link</button>
+    <p class="hint">Signed in with Google? Recover access through your Google account instead. Lost access to your email? Ask a Rudo administrator to verify your identity and update your account.</p>
+  </form>
+  <form id="reset-update" hidden>
+    <label>New password<input id="new-password" type="password" autocomplete="new-password" required minlength="12" maxlength="128"></label>
+    <label>Confirm new password<input id="confirm-password" type="password" autocomplete="new-password" required minlength="12" maxlength="128"></label>
+    <button type="submit" class="primary">Save new password</button>
+  </form>
+  <p class="links"><a href="staff-login.html">Back to sign in</a></p>
+</main>
+</body></html>

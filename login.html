@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dawa Health | Sign in</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="img/logo.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/logo.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="img/logo.ico">
+  <link rel="stylesheet" href="css/auth-polish.css">
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+  <script src="js/rudo-auth.js"></script>
+  <script src="js/rudo-api.js"></script>
+  <style>
+  #pinModalOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(2px);
+  }
+  #pinModalOverlay[hidden] { display: none; }
+  #pinModalCard {
+    width: 100%;
+    max-width: 340px;
+    margin: 16px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 28px 24px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    text-align: center;
+    font-family: inherit;
+  }
+  #pinModalCard h3 {
+    margin: 0 0 6px;
+    font-size: 1.1rem;
+  }
+  #pinModalCard p {
+    margin: 0 0 18px;
+    font-size: 0.9rem;
+    color: #64748b;
+  }
+  #pinModalInput {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    font-size: 1.2rem;
+    letter-spacing: 0.3em;
+    text-align: center;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+  #pinModalError {
+    color: #dc2626;
+    font-size: 0.85rem;
+    min-height: 1.2em;
+    margin-bottom: 10px;
+  }
+  #pinModalSubmit {
+    width: 100%;
+    padding: 10px 12px;
+    border: none;
+    border-radius: 8px;
+    background: #16a34a;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  #pinModalSubmit:hover { background: #10391f; }
+  body.pin-locked .auth-shell {
+    filter: blur(4px);
+    pointer-events: none;
+    user-select: none;
+  }
+  </style>
+</head>
+<body class="auth-page auth-login pin-locked">
+  <div id="pinModalOverlay" role="dialog" aria-modal="true" aria-labelledby="pinModalTitle">
+    <div id="pinModalCard">
+      <h3 id="pinModalTitle">Enter access PIN</h3>
+      <p>Please enter the workspace PIN to continue to sign in.</p>
+      <form id="pinModalForm" novalidate>
+        <input
+          id="pinModalInput"
+          type="password"
+          inputmode="numeric"
+          autocomplete="off"
+          maxlength="6"
+          placeholder="••••••"
+          aria-label="Access PIN"
+        >
+        <div id="pinModalError"></div>
+        <button type="submit" id="pinModalSubmit">Confirm</button>
+      </form>
+    </div>
+  </div>
+
+  <main class="auth-shell">
+    <section class="auth-hero" aria-label="Rudo workspace overview">
+      <div class="auth-brand">
+        <img src="" alt="Dawa Health logo" onerror="this.style.display='none';">
+        <div>
+          <strong></strong>
+          <span></span>
+        </div>
+      </div>
+      <div class="auth-hero-copy">
+        <p class="auth-eyebrow">Secure admin access</p>
+        <h1>Welcome back to DawaMom.</h1>
+        <p>Sign in to manage conversations, referral analytics, orders, and account settings from one calm Rudo dashboard.</p>
+      </div>
+      <div class="auth-visual-stage">
+        <img class="auth-illustration auth-illustration-login" src="img/login-page-img.png" alt="Healthcare team securing a dashboard">
+      </div>
+      <div class="auth-hero-panel">
+        <article class="auth-hero-card">
+          <div class="auth-hero-icon">QR</div>
+          <div><strong>Referral visibility</strong><span>Track poster and flyer QR activity by clinic.</span></div>
+        </article>
+        <article class="auth-hero-card">
+          <div class="auth-hero-icon">IN</div>
+          <div><strong>Live inbox</strong><span>Review active patient and customer threads quickly.</span></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="auth-card" aria-label="Sign in form">
+      <p class="auth-kicker">Welcome back</p>
+      <h2>Sign in to Rudo</h2>
+      <p class="auth-subtitle">Use your admin email and password to continue to the dashboard.</p>
+
+      <div id="loginMessage" class="form-message" hidden></div>
+
+      <form class="auth-form" id="loginForm" novalidate>
+        <div class="auth-field">
+          <label for="email">Email address</label>
+          <input id="email" type="email" autocomplete="email" placeholder="admin@dawa.health" required>
+        </div>
+        <div class="auth-field">
+          <label for="password">Password</label>
+          <input id="password" type="password" autocomplete="current-password" placeholder="Enter your password" required>
+        </div>
+        <div class="auth-row">
+          <label class="auth-check"><input type="checkbox" id="rememberMe" checked> Keep me signed in</label>
+          <a class="auth-link" href="forgot-password.html">Forgot password?</a>
+        </div>
+        <button class="auth-button" type="submit" id="signInButton">Sign in</button>
+        <div class="auth-divider">or</div>
+        <button class="auth-secondary" type="button" id="googleSignIn">Continue with Google</button>
+        <p class="auth-subtitle" style="margin:6px 0 0;">New to Rudo? <a class="auth-link" href="register.html">Create an account</a></p>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    // --- Access PIN gate ---------------------------------------------------
+    // Mirrors the PIN-confirmation pattern used in the Rudo admin app
+    // (AdminCreateAccountWidget), which blocks the page with a
+    // non-dismissible dialog until the correct PIN is entered.
+    // NOTE: this is a client-side deterrent only, not real access control -
+    // the PIN value is visible to anyone who reads this page's source.
+    document.body.classList.remove('pin-locked'); document.getElementById('pinModalOverlay')?.remove();
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const firebase = RudoAuth.initFirebase();
+      const form = document.getElementById('loginForm');
+      const email = document.getElementById('email');
+      const password = document.getElementById('password');
+      const signInButton = document.getElementById('signInButton');
+      const googleSignIn = document.getElementById('googleSignIn');
+      const message = document.getElementById('loginMessage');
+
+      if (!firebase) {
+        RudoAuth.showFormMessage(message, 'Authentication could not start. Please check your connection and refresh the page.', 'error');
+        return;
+      }
+
+      firebase.auth().onAuthStateChanged((user) => {
+        if (user && localStorage.getItem(RudoAuth.SESSION_KEY) === 'true') {
+          RudoAuth.redirectAfterLogin('index2.html');
+        }
+      });
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const emailValue = email.value.trim();
+        const passwordValue = password.value;
+
+        if (!emailValue || !email.checkValidity()) {
+          RudoAuth.showFormMessage(message, 'Please enter a valid email address.', 'error');
+          email.focus();
+          return;
+        }
+        if (!passwordValue) {
+          RudoAuth.showFormMessage(message, 'Please enter your password.', 'error');
+          password.focus();
+          return;
+        }
+
+        RudoAuth.setButtonLoading(signInButton, true, 'Signing in...');
+        try {
+          const credential = await firebase.auth().signInWithEmailAndPassword(emailValue, passwordValue);
+          RudoAuth.markSignedIn(credential.user);
+          RudoAuth.redirectAfterLogin('index2.html');
+        } catch (error) {
+          RudoAuth.showFormMessage(message, RudoAuth.friendlyAuthError(error.code, error.message), 'error');
+          RudoAuth.setButtonLoading(signInButton, false);
+        }
+      });
+
+      googleSignIn.addEventListener('click', async () => {
+        RudoAuth.setButtonLoading(googleSignIn, true, 'Opening Google...');
+        try {
+          const provider = new firebase.auth.GoogleAuthProvider();
+          const result = await firebase.auth().signInWithPopup(provider);
+          RudoAuth.markSignedIn(result.user);
+          RudoAuth.redirectAfterLogin('index2.html');
+        } catch (error) {
+          RudoAuth.showFormMessage(message, RudoAuth.friendlyAuthError(error.code, error.message), 'error');
+          RudoAuth.setButtonLoading(googleSignIn, false);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

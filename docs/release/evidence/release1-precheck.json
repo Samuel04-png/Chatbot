@@ -1,0 +1,24 @@
+{
+ "acl_fingerprint": "e67855d42d2eff721a28e78c35cc4919",
+ "bot_tables": [
+  "kv",
+  "messages",
+  "orders",
+  "referrals",
+  "user_state",
+  "users"
+ ],
+ "counts": {
+  "messages": 7861,
+  "orders": 5,
+  "referrals": 1356,
+  "users": 916
+ },
+ "current_user": "postgres",
+ "latest_message_at": "2026-11-20T09:16:08.196803+00:00",
+ "observer_control_exists": false,
+ "public_policies": 0,
+ "rls_enabled_all": true,
+ "rudo_roles": [],
+ "server_version": "17.6"
+}

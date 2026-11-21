@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dawa Health | Profile</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="img/logo.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/logo.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="img/logo.ico">
+  <link rel="stylesheet" href="css/admin-light.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body class="dashboard-body">
+  <div class="mobile-topbar">
+    <button class="icon-button" type="button" data-sidebar-toggle aria-label="Open navigation" aria-expanded="false">Menu</button>
+    <strong>Profile</strong>
+    <span class="badge badge-accent">Account</span>
+  </div>
+  <div class="mobile-nav-backdrop" data-sidebar-backdrop></div>
+  <div class="app-shell">
+    <aside class="sidebar" data-sidebar>
+      <div class="sidebar-top">
+        <div class="brand">
+          <div class="brand-mark">
+            <img src="img/logo.png" alt="Dawa Health logo" onerror="this.style.display='none'; this.parentNode.textContent='DH';">
+          </div>
+          <div class="brand-copy">
+            <h1>Dawa Health</h1>
+            <p>Rudo Admin</p>
+          </div>
+        </div>
+        <div class="badge-row">
+          <span class="badge badge-success"><span class="status-dot"></span>Workspace online</span>
+        </div>
+        <section class="sidebar-card">
+          <div class="stat-value">0</div>
+          <div class="stat-label">Live conversations connected to this workspace.</div>
+        </section>
+        <nav class="nav" aria-label="Primary">
+          <a class="nav-link" href="index2.html" data-nav="dashboard" data-close-sidebar><span class="nav-icon"><i class="fa fa-home" aria-hidden="true"></i></span><span>Dashboard</span></a>
+          <a class="nav-link" href="chats.html" data-nav="chats" data-close-sidebar><span class="nav-icon"><i class="fa fa-commenting" aria-hidden="true"></i></span><span>Chats</span></a>
+          <a class="nav-link" href="analytics.html" data-nav="analytics" data-close-sidebar><span class="nav-icon"><i class="fa fa-line-chart" aria-hidden="true"></i></span><span>Analytics</span></a>
+          <a class="nav-link" href="orders.html" data-nav="orders" data-close-sidebar><span class="nav-icon"><i class="fa fa-list" aria-hidden="true"></i></span><span>Orders</span></a>
+          <a class="nav-link" href="profile.html" data-nav="profile" data-close-sidebar><span class="nav-icon"><i class="fa fa-user" aria-hidden="true"></i></span><span>Profile</span></a>
+          <a class="nav-link" href="settings.html" data-nav="settings" data-close-sidebar><span class="nav-icon"><i class="fa fa-cog" aria-hidden="true"></i></span><span>Settings</span></a>
+        </nav>
+      </div>
+      <form class="sidebar-card sidebar-form">
+        <label for="sidebarStartNumber">Start direct WhatsApp thread</label>
+        <input class="control" id="sidebarStartNumber" inputmode="tel" placeholder="e.g. 263771234567" aria-describedby="sidebarStartHelp">
+        <div class="meta-text" id="sidebarStartHelp">Use country code. Continue in Chats to start the thread.</div>
+        <button class="button" type="button" onclick="window.location.href='chats.html'">Start New Chat</button>
+      </form>
+    </aside>
+
+    <main class="panel page-panel">
+      <header class="panel-header sticky">
+        <div class="conversation-header">
+          <div class="header-copy">
+            <p class="eyebrow">Account</p>
+            <h2 class="panel-title">Profile</h2>
+            <p class="panel-subtitle">Manage the details other admins see and keep account actions easy to find.</p>
+          </div>
+          <div class="header-actions">
+            <a class="ghost-button" href="settings.html" style="text-decoration:none;">Settings</a>
+          </div>
+        </div>
+      </header>
+
+      <div class="page-scroll">
+        <div class="content-stack">
+          <div id="profileContent" class="profile-layout">
+            <section class="profile-hero">
+              <div class="profile-identity">
+                <div class="profile-avatar-wrap">
+                  <img id="profileImage" src="img/user.jpg" alt="Profile avatar">
+                  <button class="avatar-upload" type="button" id="avatarUploadButton">Change</button>
+                  <input id="imageUpload" type="file" accept="image/*" hidden>
+                </div>
+                <div>
+                  <div class="badge-row">
+                    <span class="badge badge-success" id="accountStatusBadge">Verified admin</span>
+                    <span class="badge badge-accent" id="profileRoleBadge">Admin</span>
+                  </div>
+                  <h1 id="userNameDisplay">Rudo Admin</h1>
+                  <p id="userTitleDisplay">Workspace Administrator</p>
+                  <div class="profile-meta-row">
+                    <span id="userEmailDisplay">admin@dawa.health</span>
+                    <span id="userLocationDisplay">Lusaka, Zambia</span>
+                  </div>
+                </div>
+              </div>
+              <div class="profile-quick-actions">
+                <button class="button" type="button" id="saveProfileTop">Save profile</button>
+                <a class="ghost-button" href="settings.html" style="text-decoration:none;">Account settings</a>
+                <button class="ghost-button" type="button" id="logoutTop">Logout</button>
+              </div>
+            </section>
+
+            <form id="profileForm" class="profile-grid" novalidate>
+              <section class="profile-card">
+                <div class="profile-card-heading">
+                  <div>
+                    <p class="eyebrow">Personal</p>
+                    <h3>Personal information</h3>
+                  </div>
+                  <span class="badge badge-accent">Editable</span>
+                </div>
+                <div class="profile-fields">
+                  <label class="profile-field">Full name<input class="control" id="nameInput" required></label>
+                  <label class="profile-field">Role title<input class="control" id="titleInput" required></label>
+                  <label class="profile-field">Email<input class="control" id="emailInput" type="email" required></label>
+                  <label class="profile-field">Phone<input class="control" id="phoneInput" inputmode="tel"></label>
+                  <label class="profile-field">Location<input class="control" id="locationInput"></label>
+                  <label class="profile-field">Timezone<input class="control" id="timezoneInput"></label>
+                </div>
+              </section>
+
+              <section class="profile-card">
+                <div class="profile-card-heading">
+                  <div>
+                    <p class="eyebrow">Account</p>
+                    <h3>Account details</h3>
+                  </div>
+                  <span class="badge badge-success">Protected</span>
+                </div>
+                <dl class="detail-list">
+                  <div><dt>Firebase email</dt><dd id="firebaseEmail">Loading...</dd></div>
+                  <div><dt>Provider</dt><dd id="authProvider">Loading...</dd></div>
+                  <div><dt>Last sign-in</dt><dd id="lastSignIn">Loading...</dd></div>
+                  <div><dt>Account actions</dt><dd><a class="auth-link-inline" href="settings.html">Open settings</a></dd></div>
+                </dl>
+              </section>
+
+              <section class="profile-card profile-card-wide">
+                <div class="profile-card-heading">
+                  <div>
+                    <p class="eyebrow">About</p>
+                    <h3>Profile summary</h3>
+                  </div>
+                </div>
+                <label class="profile-field">Bio<textarea class="control profile-textarea" id="bioInput" rows="5"></textarea></label>
+              </section>
+
+              <section class="profile-card">
+                <div class="profile-card-heading">
+                  <div>
+                    <p class="eyebrow">Social</p>
+                    <h3>Social links</h3>
+                  </div>
+                </div>
+                <div class="profile-fields">
+                  <label class="profile-field">LinkedIn<input class="control" id="linkedinInput"></label>
+                  <label class="profile-field">GitHub<input class="control" id="githubInput"></label>
+                  <label class="profile-field">X / Twitter<input class="control" id="twitterInput"></label>
+                </div>
+              </section>
+
+              <section class="profile-card danger-card">
+                <div class="profile-card-heading">
+                  <div>
+                    <p class="eyebrow danger">Danger zone</p>
+                    <h3>Account safety</h3>
+                  </div>
+                </div>
+                <p>Logout is immediate. Delete account requires typed confirmation and may require a fresh sign-in from Firebase.</p>
+                <div class="profile-actions">
+                  <button class="ghost-button" type="button" id="logoutCard">Logout</button>
+                  <button class="ghost-button danger" type="button" id="deleteAccountCard">Delete account</button>
+                </div>
+              </section>
+
+              <section class="profile-save-bar profile-card-wide">
+                <div>
+                  <strong>Ready to save?</strong>
+                  <span id="profileSaveMessage" class="meta-text">Changes stay available across this browser and sync to the account menu.</span>
+                </div>
+                <button class="button" type="submit" id="saveProfileButton">Save profile</button>
+              </section>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+  <script src="js/rudo-auth.js"></script>
+  <script src="js/rudo-api.js"></script>
+  <script src="js/admin-shell.js"></script>
+  <script>
+    AdminShell.setupShell('profile');
+
+    const profileContent = document.getElementById('profileContent');
+    const profileForm = document.getElementById('profileForm');
+    const saveMessage = document.getElementById('profileSaveMessage');
+    const saveButton = document.getElementById('saveProfileButton');
+
+    function setValue(id, value) {
+      const element = document.getElementById(id);
+      if (element) element.value = value || '';
+    }
+
+    function setText(id, value) {
+      const element = document.getElementById(id);
+      if (element) element.textContent = value || '-';
+    }
+
+    function renderProfile(profile, user) {
+      document.getElementById('profileImage').src = profile.profileImage || 'img/user.jpg';
+      setText('userNameDisplay', profile.name);
+      setText('userTitleDisplay', profile.title);
+      setText('userEmailDisplay', profile.email);
+      setText('userLocationDisplay', profile.location);
+      setText('profileRoleBadge', profile.role || 'Admin');
+
+      setValue('nameInput', profile.name);
+      setValue('titleInput', profile.title);
+      setValue('emailInput', profile.email);
+      setValue('phoneInput', profile.phone);
+      setValue('locationInput', profile.location);
+      setValue('timezoneInput', profile.timezone);
+      setValue('bioInput', profile.bio);
+      setValue('linkedinInput', profile.linkedin);
+      setValue('githubInput', profile.github);
+      setValue('twitterInput', profile.twitter);
+
+      const provider = user?.providerData?.[0]?.providerId || 'Local profile';
+      setText('firebaseEmail', user?.email || profile.email);
+      setText('authProvider', provider.replace('.com', ''));
+      setText('lastSignIn', user?.metadata?.lastSignInTime ? new Date(user.metadata.lastSignInTime).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'Current browser session');
+    }
+
+    function getProfileFromForm() {
+      return {
+        name: document.getElementById('nameInput').value.trim(),
+        title: document.getElementById('titleInput').value.trim(),
+        role: document.getElementById('profileRoleBadge').textContent.trim() || 'Admin',
+        email: document.getElementById('emailInput').value.trim(),
+        phone: document.getElementById('phoneInput').value.trim(),
+        location: document.getElementById('locationInput').value.trim(),
+        timezone: document.getElementById('timezoneInput').value.trim(),
+        bio: document.getElementById('bioInput').value.trim(),
+        linkedin: document.getElementById('linkedinInput').value.trim(),
+        github: document.getElementById('githubInput').value.trim(),
+        twitter: document.getElementById('twitterInput').value.trim(),
+        profileImage: document.getElementById('profileImage').src
+      };
+    }
+
+    async function saveProfile() {
+      const profile = getProfileFromForm();
+      if (!profile.name) {
+        saveMessage.textContent = 'Please add a full name before saving.';
+        document.getElementById('nameInput').focus();
+        return;
+      }
+      if (!profile.email || !document.getElementById('emailInput').checkValidity()) {
+        saveMessage.textContent = 'Please enter a valid email address.';
+        document.getElementById('emailInput').focus();
+        return;
+      }
+
+      RudoAuth.setButtonLoading(saveButton, true, 'Saving...');
+      try {
+        const saved = RudoAuth.saveProfile(profile);
+        const user = window.firebase?.auth().currentUser;
+        if (user && user.updateProfile) {
+          await user.updateProfile({ displayName: saved.name, photoURL: saved.profileImage });
+        }
+        renderProfile(saved, user);
+        AdminShell.refreshAccountMenus();
+        saveMessage.textContent = 'Profile saved successfully.';
+      } catch (error) {
+        saveMessage.textContent = error.message || 'Profile saved locally, but account sync could not finish.';
+      } finally {
+        RudoAuth.setButtonLoading(saveButton, false);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderProfile(RudoAuth.getProfile(), window.firebase?.auth().currentUser);
+      RudoAuth.authReady().then((user) => {
+        renderProfile(RudoAuth.getProfile(), user);
+      });
+    });
+
+    profileForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      saveProfile();
+    });
+
+    document.getElementById('saveProfileTop').addEventListener('click', saveProfile);
+    document.getElementById('logoutTop').addEventListener('click', () => RudoAuth.signOut('login.html'));
+    document.getElementById('logoutCard').addEventListener('click', () => RudoAuth.signOut('login.html'));
+    document.getElementById('deleteAccountCard').addEventListener('click', () => AdminShell.openDeleteModal());
+    document.getElementById('avatarUploadButton').addEventListener('click', () => document.getElementById('imageUpload').click());
+    document.getElementById('imageUpload').addEventListener('change', (event) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        document.getElementById('profileImage').src = reader.result;
+        saveMessage.textContent = 'Avatar selected. Save profile to keep this change.';
+      };
+      reader.readAsDataURL(file);
+    });
+  </script>
+</body>
+</html>

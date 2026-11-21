@@ -1,0 +1,61 @@
+{
+  "repository": "https://github.com/Samuel04-png/rudo_medgemma",
+  "commit": "af2545c92aea2cbcda5c6d717f67598b386a373d",
+  "inspected_files": [
+    {
+      "path": "LICENSE.txt",
+      "bytes": 34523,
+      "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0"
+    },
+    {
+      "path": "api/index.py",
+      "bytes": 190,
+      "sha256": "6af8ca4c53a81b2301dcf265a20e4d4f44ec6a2382b02756d908d166374df3cf"
+    },
+    {
+      "path": "db.py",
+      "bytes": 8624,
+      "sha256": "e0abaa9827bbc1b020f8e249daaa80851accc6dacb78e2be65a5196a3da766c3"
+    },
+    {
+      "path": "langid_client.py",
+      "bytes": 1082,
+      "sha256": "16a0ba366dc224b25ed7468b5dc076de36425c07e4c3d415eb991d07aca8d661"
+    },
+    {
+      "path": "main.py",
+      "bytes": 88999,
+      "sha256": "1116e5974c2afc0c5c80de1936f023dbf80bf42dd2ad7cdb7394b0ddcaeb508f"
+    },
+    {
+      "path": "medgemma_client.py",
+      "bytes": 3292,
+      "sha256": "a4a549be9d8a06b13baa9c609473ca93b9ba732dd148bb9a7511ea6a133e1b8a"
+    },
+    {
+      "path": "medgemma_guardrails.py",
+      "bytes": 5478,
+      "sha256": "0cda0be0fdafbd4c6a229cb12ca0ad04f244ad06bbf8083bea36257920b995e5"
+    },
+    {
+      "path": "nlp_endpoints.py",
+      "bytes": 5226,
+      "sha256": "1b7d39a62e712b74c0520fb83ef8a392678e3e85c5ae6c50d59e978177614a01"
+    },
+    {
+      "path": "requirements.txt",
+      "bytes": 138,
+      "sha256": "fb3f795a3ca683ba9ec22dc7729c27e1f8bd9dfe39a261fb4884d568821c3b38"
+    },
+    {
+      "path": "translategemma_client.py",
+      "bytes": 15478,
+      "sha256": "82436bf914277a22aa8588fe4b1a822cdc8b0a257091665b066b174d2d3ff1e3"
+    },
+    {
+      "path": "vercel.json",
+      "bytes": 240,
+      "sha256": "d195d3d459dbfdd705f7d20968673c75fd1a62aee27b266588aa25cce65a8292"
+    }
+  ]
+}

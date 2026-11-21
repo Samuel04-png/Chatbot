@@ -1,0 +1,174 @@
+{
+  "inspection_date": "2026-11-20",
+  "purpose": "Read-only integration audit source fingerprint; no patient logs, credentials or image content included",
+  "files": [
+    {
+      "path": ".env.example",
+      "sha256": "4fe4922d2ee9923f787a7773aaf2f9ef6f98dc5e4dbc9230d4f57eb55c3634a6"
+    },
+    {
+      "path": "analytics copy.html",
+      "sha256": "55a944d801606b1425fb5d6e2b5ddb816c67e9729f779d6cdcf8f7504b621abf"
+    },
+    {
+      "path": "analytics.html",
+      "sha256": "302d1c5ad6864db3acece7d0158f04ac851f89e6cf2aa422335b1285fd277840"
+    },
+    {
+      "path": "app.py",
+      "sha256": "5c7d48a5923168fc02da2f5bd7d7654c0bb1620b0a86a7a431e199324e0d1f38"
+    },
+    {
+      "path": "cake_orders.html",
+      "sha256": "52dc09840df7323bfb27737a8ea25e69d6fc1b25921c99b8ed433735a1b2c21c"
+    },
+    {
+      "path": "change-password.html",
+      "sha256": "cc75b8ca1b0dc384148747d986310bcc1707fd36bb8d5f7a8d5449fbe7d792d9"
+    },
+    {
+      "path": "chats copy.html",
+      "sha256": "7d1ad97dfc77445561de01f3264e7809b3164b66c3d36843a48052b33dd7ae42"
+    },
+    {
+      "path": "chats.html",
+      "sha256": "4e93e76ccf9a1b37fd2fd8e64089b6035a9892d201eaa1d3954b9d1407e9fa50"
+    },
+    {
+      "path": "forgot-password.html",
+      "sha256": "5dfc28660b02820dc6f6833886ab80a6f26c6f40542b6581352298cd29886476"
+    },
+    {
+      "path": "index.html",
+      "sha256": "2d8459abb3128d2df2a33043fe292fa6524b9c4d4c7abbd9d7713a5a688494eb"
+    },
+    {
+      "path": "index2.html",
+      "sha256": "2d8459abb3128d2df2a33043fe292fa6524b9c4d4c7abbd9d7713a5a688494eb"
+    },
+    {
+      "path": "js/admin-shell.js",
+      "sha256": "670b68cce1e88bc43338bb3b9865578ac71ab70c1646ed97f49bd0c43e9d156f"
+    },
+    {
+      "path": "js/risk-triage.js",
+      "sha256": "b498f0982038ded5bce0668b1bacc4301daa51b7f94924e71c4d6836f4fa822b"
+    },
+    {
+      "path": "js/rudo-api.js",
+      "sha256": "5bbd21bd2e15c1239dde35ff6aa986f16c696dee9a6fd43c7d0e4d5be666af49"
+    },
+    {
+      "path": "js/rudo-auth.js",
+      "sha256": "fc27ebcbd23f875fddc1fc3929072becadafe1a917bb3b0da6a5d63f5ea81a7d"
+    },
+    {
+      "path": "login.html",
+      "sha256": "25c1fde1311b39d1f63beb5924c8a846facc5e13f8f2f140c460e40eecda2221"
+    },
+    {
+      "path": "orders.html",
+      "sha256": "6085c9eed6f36907f46d19cee68fc51effd8557423e205e4f1641b61792d33bf"
+    },
+    {
+      "path": "profile.html",
+      "sha256": "1da9b167beea46dd9f90a279d7d94e056352d1e87417dd440af8c8d5827cdd70"
+    },
+    {
+      "path": "register.html",
+      "sha256": "5bf26f1e5eea9d1f1b459d61b611d83c186ba5c0148d2f33681f1cb595268fe4"
+    },
+    {
+      "path": "requirements-dev.txt",
+      "sha256": "ad4a022e024e5e42c281f415a680090b63523a36f9ca800c8736b3063f4005f6"
+    },
+    {
+      "path": "requirements.txt",
+      "sha256": "f190c3c69f3375b98ceca50e717d019734336d2d9aa9152abdcc8d33ddfd9465"
+    },
+    {
+      "path": "reset-password.html",
+      "sha256": "c190c6aae81b2097880b12b99dd424ae8d3ea97807e7e9a91a56bddd8401281c"
+    },
+    {
+      "path": "rudo/__init__.py",
+      "sha256": "5452ea85c02235718d4704cd878005857f2265694f77cc0f7f7df318bbc1da21"
+    },
+    {
+      "path": "rudo/auth.py",
+      "sha256": "1ef3da2fe3edb3cf34cdd6504b20acee5cae322abebf3c0b42a9c9baeac61fec"
+    },
+    {
+      "path": "rudo/db.py",
+      "sha256": "15b117d6ce69ab356fadd7961f2bfaa7667bcca1141cb0274005be4653bb6d27"
+    },
+    {
+      "path": "rudo/delivery.py",
+      "sha256": "2be8c96163faff53e827c3b8657b3a460de87be84bb6d61daee1a55041e7ea08"
+    },
+    {
+      "path": "rudo/errors.py",
+      "sha256": "a195dd020c354695d0c8702e34163dcc698ea498c29d082433e545de2edbacf8"
+    },
+    {
+      "path": "rudo/importer.py",
+      "sha256": "a46c10e229d437e5b2fd2c89f1789f7d421d2b9a16b21575949a659aa9d24287"
+    },
+    {
+      "path": "scripts/apply_local_migrations.py",
+      "sha256": "e4dfb78662539efafc667574747bdd49b3da692d97c15a80c8a3ff53b0f67619"
+    },
+    {
+      "path": "scripts/inspect_remote_schema.sql",
+      "sha256": "c2c4b974a8a22f17cfe9d980c09f1518a3c5e31ce1228222a200d38c7f7ac919"
+    },
+    {
+      "path": "scripts/prepare_import.py",
+      "sha256": "e4b370bcf72194260cbd60eecfc372cdb7958f7ca6393e8987f55098e8aaf6d4"
+    },
+    {
+      "path": "scripts/start_test_database.sh",
+      "sha256": "c64fa7ceceebed25941e2e099cd2df125a6599b340b27833a9a280d1464d9613"
+    },
+    {
+      "path": "settings.html",
+      "sha256": "50f7d2881a0f7dbbb09eb23c45d6a55142b02faff79aaad0c6357d18686bdc6e"
+    },
+    {
+      "path": "supabase/config.toml",
+      "sha256": "a3eac69558fb4cbd86b1afe930068e629d4d5c72eed64697cf74adf20a465f2e"
+    },
+    {
+      "path": "supabase/migrations/202611200001_rudo_private.sql",
+      "sha256": "175fbdcfe60a601027bbee348c1788f56d70d410235fe2e3d663d7a89a316ff8"
+    },
+    {
+      "path": "tests/conftest.py",
+      "sha256": "6824c7237feba867b5d4ab5cd7906cbf1b8fa36d36989aa4ab05ab060af41de1"
+    },
+    {
+      "path": "tests/test_api.py",
+      "sha256": "3bf02fac779cf70e75a9409c42092e6b6dc22b5bdaebb9847e838e0e50405cb6"
+    },
+    {
+      "path": "tests/test_browser.py",
+      "sha256": "2ad3cb1a5f968b01ffc59ca2d7f6208c92603560e5902da5d4a04667c6fcc26a"
+    },
+    {
+      "path": "tests/test_database.py",
+      "sha256": "23515cacf78d30fcf36a8be6d2837dae0bb3c42cd86a0fc6fcd659d976bc81d9"
+    },
+    {
+      "path": "tests/test_delivery_auth.py",
+      "sha256": "01f0cf981c902183a8e439830347f9d310aaf116b84aa111a54f61ed9720010e"
+    },
+    {
+      "path": "tests/test_source_safety.py",
+      "sha256": "3c10c5a8e3bdce606c706990f0f0fce4a6a3494d216725f37d49ce31913ef5f0"
+    },
+    {
+      "path": "tests/test_triage.py",
+      "sha256": "0a149b291c2aed78b70c844977bca495337f10dec0f460e39d7a3e563e51c247"
+    }
+  ]
+}

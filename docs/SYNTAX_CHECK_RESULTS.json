@@ -1,0 +1,93 @@
+{
+  "python_app_ast": "passed",
+  "javascript_checks": [
+    {
+      "file": "js/rudo-auth.js",
+      "syntax_ok": true
+    },
+    {
+      "file": "js/admin-shell.js",
+      "syntax_ok": true
+    },
+    {
+      "file": "js/risk-triage.js",
+      "syntax_ok": true
+    },
+    {
+      "file": "profile.html",
+      "inline_script": 5,
+      "syntax_ok": true
+    },
+    {
+      "file": "index2.html",
+      "inline_script": 6,
+      "syntax_ok": true
+    },
+    {
+      "file": "index.html",
+      "inline_script": 6,
+      "syntax_ok": true
+    },
+    {
+      "file": "forgot-password.html",
+      "inline_script": 4,
+      "syntax_ok": true
+    },
+    {
+      "file": "register.html",
+      "inline_script": 4,
+      "syntax_ok": true
+    },
+    {
+      "file": "reset-password.html",
+      "inline_script": 4,
+      "syntax_ok": true
+    },
+    {
+      "file": "login.html",
+      "inline_script": 4,
+      "syntax_ok": true
+    },
+    {
+      "file": "change-password.html",
+      "inline_script": 4,
+      "syntax_ok": true
+    },
+    {
+      "file": "orders.html",
+      "inline_script": 5,
+      "syntax_ok": true
+    },
+    {
+      "file": "cake_orders.html",
+      "inline_script": 1,
+      "syntax_ok": true
+    },
+    {
+      "file": "analytics.html",
+      "inline_script": 7,
+      "syntax_ok": true
+    },
+    {
+      "file": "chats.html",
+      "inline_script": 6,
+      "syntax_ok": true
+    },
+    {
+      "file": "settings.html",
+      "inline_script": 5,
+      "syntax_ok": true
+    },
+    {
+      "file": "chats copy.html",
+      "inline_script": 1,
+      "syntax_ok": true
+    },
+    {
+      "file": "analytics copy.html",
+      "inline_script": 6,
+      "syntax_ok": true
+    }
+  ],
+  "note": "Syntax only; no application server, provider calls or workflow integration executed."
+}

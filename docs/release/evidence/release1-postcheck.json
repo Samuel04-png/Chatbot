@@ -1,0 +1,53 @@
+{
+ "acl_fingerprint_unchanged_from_precheck": "e67855d42d2eff721a28e78c35cc4919",
+ "address_visible_to_rudo_observer": false,
+ "api_roles_on_observer_control": {
+  "anon": false,
+  "authenticated": false,
+  "service_role": false
+ },
+ "counts": {
+  "messages": 7861,
+  "users": 916
+ },
+ "facilities": 0,
+ "kv_user_state_visible_to_rudo_observer": false,
+ "latest_message_at": "2026-11-20T09:16:08.196803+00:00",
+ "mapped_phones": 0,
+ "message_en_visible_to_rudo_observer": false,
+ "observer_control_exists": true,
+ "public_policies": [
+  "users.rudo_observer_read TO rudo_observer",
+  "messages.rudo_observer_read TO rudo_observer",
+  "referrals.rudo_observer_read TO rudo_observer",
+  "orders.rudo_observer_read TO rudo_observer"
+ ],
+ "rls_enabled_all": true,
+ "rudo_roles": [
+  {
+   "bypassrls": false,
+   "createrole": false,
+   "has_password": true,
+   "login": true,
+   "r": "rudo_observer",
+   "super": false
+  },
+  {
+   "bypassrls": false,
+   "createrole": false,
+   "has_password": true,
+   "login": true,
+   "r": "rudo_observer_audit",
+   "super": false
+  },
+  {
+   "bypassrls": false,
+   "createrole": false,
+   "has_password": true,
+   "login": true,
+   "r": "rudo_staff_admin",
+   "super": false
+  }
+ ],
+ "staff": 0
+}

@@ -1,0 +1,27 @@
+.venv/
+.env
+.env.*
+!.env.example
+__pycache__/
+.pytest_cache/
+.coverage
+htmlcov/
+*.log
+.DS_Store
+supabase/.temp/
+.local/
+test-results/
+playwright-report/
+# Credentials, keys and identity exports: never commit (checked by scripts/check_secrets.py)
+firebase-service.json
+supabase-service.json
+*firebase-adminsdk*.json
+*service-account*.json
+*service_account*.json
+*credentials*.json
+firebase-users*.json
+auth-export*.json
+*.pem
+*.key
+*.p12
+backups/

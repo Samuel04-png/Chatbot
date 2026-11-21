@@ -1,0 +1,326 @@
+{
+  "audit_date": "2026-11-20",
+  "description": "Original local source inventory; paths, sizes and whole-file integrity digests only. Logs were hashed as opaque bytes, not read for analysis. No credential fingerprints.",
+  "files": [
+    {
+      "path": "analytics copy.html",
+      "bytes": 26623,
+      "sha256": "36535fb1aa135fdc4d555a25b7e22b786d0b282ab6fdd8a9148f92eeccc194fe"
+    },
+    {
+      "path": "analytics.html",
+      "bytes": 44833,
+      "sha256": "af63ea8015f155e49d84cc21d2264e4b1b00655248ba1b0288ea7ffc431ecc7f"
+    },
+    {
+      "path": "app.py",
+      "bytes": 14200,
+      "sha256": "117fab333c1ca00037f4f761fa2d631baf1b4fdcfdfc515d98c7dbda33bdfde1"
+    },
+    {
+      "path": "cake_orders.html",
+      "bytes": 23138,
+      "sha256": "edfb1156d6cd81015cabe25afbe66ba448b36c2057e15e56e41e3563e11af578"
+    },
+    {
+      "path": "change-password.html",
+      "bytes": 4652,
+      "sha256": "f45ca95c0de7ed3affe0f9e80cd34a8d03874db25797671ed602d6121500afab"
+    },
+    {
+      "path": "chats copy.html",
+      "bytes": 24783,
+      "sha256": "7210fd98cab599038479867e098f04db2080a48d200b16d648b2eee80c105a93"
+    },
+    {
+      "path": "chats.html",
+      "bytes": 30037,
+      "sha256": "999f2109cb40c97fae6258dccd68acc92796f6b8aa9dd945ef78c99af4c0016f"
+    },
+    {
+      "path": "css/admin-light.css",
+      "bytes": 29314,
+      "sha256": "d61b983a3779fefecdcc7f552032f2b092716f88e85ac040c5e39940b7314ad0"
+    },
+    {
+      "path": "css/animate.css",
+      "bytes": 77758,
+      "sha256": "a6bd510fcb0a3e7e274824c8272223a2d9d664ce6634559f18200f9fc0bb4371"
+    },
+    {
+      "path": "css/auth-polish.css",
+      "bytes": 11059,
+      "sha256": "4f187ef2e3898238ab1e7a0764a2a98c3137bfa0fa1bb9c42ac94af58bc31eb3"
+    },
+    {
+      "path": "css/bootstrap.css",
+      "bytes": 198313,
+      "sha256": "d619bbc4f158e072ff18f7d6cf9f7991c34b566b8c0b8de73da8284215936f9f"
+    },
+    {
+      "path": "css/core.css",
+      "bytes": 329785,
+      "sha256": "5102fd79be292ebd5277132db67c141772c08da192921e3589ffaa8723d8df44"
+    },
+    {
+      "path": "css/core.min.css",
+      "bytes": 270919,
+      "sha256": "b5ecb6a6f5b1a5b30b3f2823c429f4c92364bee5d63b3b374038285c912dd76c"
+    },
+    {
+      "path": "css/icon-font.css",
+      "bytes": 197350,
+      "sha256": "51ead50caf1f0899d9afa1575133fec9664251ad0b50c5b54e66dcb3aef42ff7"
+    },
+    {
+      "path": "css/icon-font.min.css",
+      "bytes": 163432,
+      "sha256": "cebb7a4b7c6e767cad2f24ae54c5fe7bc45a017a61d2b8ca15b20247b177006d"
+    },
+    {
+      "path": "css/jquery.fancybox.min.css",
+      "bytes": 12795,
+      "sha256": "5736e3eec0c34bfc288854b7b8d2a8f1e22e9e2e7dae3c8d1ad5dfb2d4734ad0"
+    },
+    {
+      "path": "css/media.css",
+      "bytes": 3900,
+      "sha256": "643d8992e8f37cf5793c4b312ef0e54caf4235beb729b77c1c3e61d9ac76ae7a"
+    },
+    {
+      "path": "css/minibar.virtual.css",
+      "bytes": 15759,
+      "sha256": "bf817f01048e4047469353f680f568807307ea32e2aae09b6d0556369215c547"
+    },
+    {
+      "path": "css/style.css",
+      "bytes": 91345,
+      "sha256": "a20dd1462448881cda0bb1369bb418c973e5930fc17466d356d69ab3edfe2392"
+    },
+    {
+      "path": "css/style.min.css",
+      "bytes": 69015,
+      "sha256": "eab7d7a81976cf900b132bafc6c93746a9bb1923a46333ec94e513a5252652ab"
+    },
+    {
+      "path": "css/theme.css",
+      "bytes": 57,
+      "sha256": "ee111ba65055e8a06d025b058159efd4fe5756ecdc427ac00243b19a587b2184"
+    },
+    {
+      "path": "css/topbar.virtual.css",
+      "bytes": 12140,
+      "sha256": "b81a1261c6aca91c1a4020c2c3e6727a3958df1d092b0b905ba1b0d9ce32c8cf"
+    },
+    {
+      "path": "css/ui-refresh.css",
+      "bytes": 7941,
+      "sha256": "c3153f5a7b9fe34fdd81368713e81a06e5987275738bb36b2d1235038d887988"
+    },
+    {
+      "path": "css/virtual.css",
+      "bytes": 26248,
+      "sha256": "b3090b0bc5765d0b7abdc26915f4e02598d4c6f252fac076591c8058199c1918"
+    },
+    {
+      "path": "forgot-password.html",
+      "bytes": 4629,
+      "sha256": "3cdb004008f9d86347f633f30a2d73d8b840052cff6fdaaca26e870c5c1c2d94"
+    },
+    {
+      "path": "img/dawa_cross.png",
+      "bytes": 43940,
+      "sha256": "542fba80e2a33deaaaf2b7111fd2d7411d42178117d76abd1e43566d749f3fc4"
+    },
+    {
+      "path": "img/deskapp-logo.avif",
+      "bytes": 11485,
+      "sha256": "fcbfb2def3a15d1acb74d083521dfd35e11e79f56054a48da8d893fb6624e432"
+    },
+    {
+      "path": "img/forgot-password.png",
+      "bytes": 28814,
+      "sha256": "5c07f9473fb61de3e600e25013d7e291898d0639f6979940e84d06819e251065"
+    },
+    {
+      "path": "img/login-page-img.png",
+      "bytes": 214656,
+      "sha256": "8450bb277049fe9aa25f537600fae472e168645b6fd899526f72b8852d7f6132"
+    },
+    {
+      "path": "img/logo.ico",
+      "bytes": 13588,
+      "sha256": "7cb8aad1a4828ca1627b8c5e56bed735919905a5bb33ab9bf0efd2815cf3438e"
+    },
+    {
+      "path": "img/logo.png",
+      "bytes": 54740,
+      "sha256": "045e72d7027b89bc352395732b91dc8c969f113da72c8fa52673f3986c29bda7"
+    },
+    {
+      "path": "img/person.svg",
+      "bytes": 1673,
+      "sha256": "13aeef3d1f991dd5ce99c3d1ace7c11590bd8d7ba43836a39f99414320ed26e7"
+    },
+    {
+      "path": "img/register-page-img.png",
+      "bytes": 214656,
+      "sha256": "8450bb277049fe9aa25f537600fae472e168645b6fd899526f72b8852d7f6132"
+    },
+    {
+      "path": "img/ulizaMama.jpg",
+      "bytes": 89411,
+      "sha256": "9ab38d6bd5b49fba5e2b733a6c8a28544ccb0e10bbaf66b515b65fce5dfc105e"
+    },
+    {
+      "path": "img/user.jpg",
+      "bytes": 42664,
+      "sha256": "4aef2aab7f8ac4ac4acae5fbcf3304fb537c904c879ee6062b39ab905c5b57e1"
+    },
+    {
+      "path": "index.html",
+      "bytes": 29788,
+      "sha256": "9e5705d19ebf6dcd93f9a013d3f02de46a268a123c381bdebfe6b3f591192110"
+    },
+    {
+      "path": "index2.html",
+      "bytes": 29788,
+      "sha256": "acfb56990e30e82f3fd6a3bdff10b6a67fc01f97b487643b5b84ca3cceed4dfe"
+    },
+    {
+      "path": "js/admin-shell.js",
+      "bytes": 11354,
+      "sha256": "e94e79f3497ff45d06bcaedfc3a396b2f73698c14717ce9e87f5cd8595e8780c"
+    },
+    {
+      "path": "js/bootstrap.bundle.min.js",
+      "bytes": 81084,
+      "sha256": "5edf297381b409d711bc8d27676951a59e151e783412850332519c05243d1e24"
+    },
+    {
+      "path": "js/core.js",
+      "bytes": 1594554,
+      "sha256": "95b05192a5bda4f4442a5e361e5e9693e22a67ee27e2bfa940590bf0aaaa35fc"
+    },
+    {
+      "path": "js/google-maps.js",
+      "bytes": 419,
+      "sha256": "43b552227c4c2f13594d4ee753a796f5d898628625af0afe4b5512ec520b9ae7"
+    },
+    {
+      "path": "js/isotope.pkgd.min.js",
+      "bytes": 35445,
+      "sha256": "081ae9baaacc857c1c2cb51de6dbd0e1eb811c2761ef01a50df373f2f6eefe22"
+    },
+    {
+      "path": "js/jquery-3.5.1.min.js",
+      "bytes": 89476,
+      "sha256": "9a2723c21fb1b7dff0e2aa5dc6be24a9670220a17ae21f70fdbc602d1f8acd38"
+    },
+    {
+      "path": "js/jquery.animateNumber.min.js",
+      "bytes": 1391,
+      "sha256": "18201e44a097144b4b4d9fa01b548222bb46918ab5cd98cc5e48fe5d414d26aa"
+    },
+    {
+      "path": "js/jquery.fancybox.min.js",
+      "bytes": 68253,
+      "sha256": "cadda460ccb4c3c01bb45f3d5976f63f5adf8dc3ff1d31cb4fbd3ded4f18e5bf"
+    },
+    {
+      "path": "js/jquery.nice-select.min.js",
+      "bytes": 2942,
+      "sha256": "66bdef0724e5306421bcc7e0910e41b5645228119ad9096ca4a6099e48d94e6a"
+    },
+    {
+      "path": "js/jquery.waypoints.min.js",
+      "bytes": 9036,
+      "sha256": "f6b512fa4ef66539b9215216cd077291f16206bac966eb1a1504e6e5e4050f3d"
+    },
+    {
+      "path": "js/layout-settings.js",
+      "bytes": 5890,
+      "sha256": "640995cec2c96231a7ed404d051e70c87dd566f255296f967165ebb6f1464805"
+    },
+    {
+      "path": "js/minibar-virtual.js",
+      "bytes": 4796,
+      "sha256": "2b4744ab2c0849a0c6cdde1e7c52a99a2781b125b2301b15d26165b796d44a38"
+    },
+    {
+      "path": "js/process.js",
+      "bytes": 1019,
+      "sha256": "6055adbcfa9189bfa4ce6d7d303ebad5c5b722337f34afa62e4e5d492e3f58d4"
+    },
+    {
+      "path": "js/risk-triage.js",
+      "bytes": 12238,
+      "sha256": "b498f0982038ded5bce0668b1bacc4301daa51b7f94924e71c4d6836f4fa822b"
+    },
+    {
+      "path": "js/rudo-auth.js",
+      "bytes": 7169,
+      "sha256": "b2c1db93440b3e2ebfd70925a016e8502367f422d446b0d46a03590cd6fdc2ae"
+    },
+    {
+      "path": "js/script.js",
+      "bytes": 9005,
+      "sha256": "232c4597a2287d53e8eda3c6fa9440b63541a43d88a5177b5bfb54cde637c5cf"
+    },
+    {
+      "path": "js/topbar-virtual.js",
+      "bytes": 6362,
+      "sha256": "df2990ffb3cd08c7c79fbd1076842b4834ab491c9a4fcc4e1d39eff6a8b75f85"
+    },
+    {
+      "path": "js/wow.min.js",
+      "bytes": 8155,
+      "sha256": "7852a22b72ead62cfc4a1b1ca32874b3e222f232a991a6d1432313572f534135"
+    },
+    {
+      "path": "login.html",
+      "bytes": 9710,
+      "sha256": "1ac52c796517155d6d3ab9dbed896219c4b0b301ed19c5faf69a857f200ea79f"
+    },
+    {
+      "path": "orders.html",
+      "bytes": 19592,
+      "sha256": "b19e033579f0b7bd3e9c06b133e1302ec1dd74b72f2053a02dc61029989c1ae7"
+    },
+    {
+      "path": "profile.html",
+      "bytes": 15573,
+      "sha256": "3cd6d68c0d1437e79b99725a230135f2ff15df452e08851a7fd2e5350112accb"
+    },
+    {
+      "path": "register.html",
+      "bytes": 11582,
+      "sha256": "178df58e7c5d37c5d3e368068ce92ee808a1cac722324b7e22d32e8e43d10552"
+    },
+    {
+      "path": "requirements.txt",
+      "bytes": 32,
+      "sha256": "1dbd93fafcb1ede30cccfc7cb45de1650d08f89e623bd936cbc3934e5d58a322"
+    },
+    {
+      "path": "reset-password.html",
+      "bytes": 5395,
+      "sha256": "eed72779fb9c89366c40dcc0629fca80bb9c8f6eb7c11717640a8962259ac45f"
+    },
+    {
+      "path": "rudo-server.err.log",
+      "bytes": 3534,
+      "sha256": "c7716b5ad76faabc75d92af586c8be851ff705d88d1200b5619181d159e9f8c1"
+    },
+    {
+      "path": "rudo-server.out.log",
+      "bytes": 47,
+      "sha256": "e1989dbe66ba1790caf3de441d438fee455434541354ede904830ae5a1c1dd01"
+    },
+    {
+      "path": "settings.html",
+      "bytes": 11036,
+      "sha256": "bf77b47ef19c151f90e82348f31fcbecada0ea99ab28634f9a6b2b36033a1733"
+    }
+  ]
+}

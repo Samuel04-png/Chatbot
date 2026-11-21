@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dawa Health | Chats</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="img/logo.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/logo.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="img/logo.ico">
+  <link rel="stylesheet" href="css/admin-light.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <style>
+    .chat-tag-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .chat-risk-tag {
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+    .chat-risk-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 4px 0 0;
+      color: #6b7280;
+    }
+    .chat-risk-meta::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #d1d5db;
+      flex-shrink: 0;
+    }
+    .chat-item.active {
+      border-left: none !important;
+      box-shadow: none !important;
+      outline: none !important;
+    }
+    .chat-item.active::before,
+    .chat-item.active::after {
+      display: none !important;
+      content: none !important;
+    }
+  </style>
+</head>
+<body class="dashboard-body">
+  <div class="mobile-topbar">
+    <button class="icon-button" type="button" data-sidebar-toggle aria-label="Open navigation" aria-expanded="false">Menu</button>
+    <strong>Rudo Admin</strong>
+    <span class="badge badge-success">Online</span>
+  </div>
+  <div class="mobile-nav-backdrop" data-sidebar-backdrop></div>
+  <div class="app-shell" id="chatApp">
+    <aside class="sidebar" data-sidebar>
+      <div class="sidebar-top">
+        <div class="brand">
+          <div class="brand-mark">
+            <img src="img/logo.png" alt="Dawa Health logo" onerror="this.style.display='none'; this.parentNode.textContent='DH';">
+          </div>
+          <div class="brand-copy">
+            <h1>Dawa Health</h1>
+            <p>Rudo Admin</p>
+          </div>
+        </div>
+        <div class="badge-row">
+          <span class="badge badge-success"><span class="status-dot"></span>Workspace online</span>
+        </div>
+        <section class="sidebar-card">
+          <div class="stat-value" id="chatCount">0</div>
+          <div class="stat-label">Live conversations connected to this workspace.</div>
+        </section>
+        <nav class="nav" aria-label="Primary">
+          <a class="nav-link" href="index2.html" data-nav="dashboard" data-close-sidebar><span class="nav-icon"><i class="fa fa-home" aria-hidden="true"></i></span><span>Dashboard</span></a>
+          <a class="nav-link" href="chats.html" data-nav="chats" data-close-sidebar><span class="nav-icon"><i class="fa fa-commenting" aria-hidden="true"></i></span><span>Chats</span></a>
+          <a class="nav-link" href="analytics.html" data-nav="analytics" data-close-sidebar><span class="nav-icon"><i class="fa fa-line-chart" aria-hidden="true"></i></span><span>Analytics</span></a>
+          <a class="nav-link" href="orders.html" data-nav="orders" data-close-sidebar><span class="nav-icon"><i class="fa fa-list" aria-hidden="true"></i></span><span>Orders</span></a>
+          <a class="nav-link" href="profile.html" data-nav="profile" data-close-sidebar><span class="nav-icon"><i class="fa fa-user" aria-hidden="true"></i></span><span>Profile</span></a>
+          <a class="nav-link" href="settings.html" data-nav="settings" data-close-sidebar><span class="nav-icon"><i class="fa fa-cog" aria-hidden="true"></i></span><span>Settings</span></a>
+        </nav>
+      </div>
+      <form class="sidebar-card sidebar-form" id="newChatForm">
+        <label for="newNumber">Start direct WhatsApp thread</label>
+        <input class="control" id="newNumber" inputmode="tel" placeholder="e.g. 263771234567" aria-describedby="newChatHelp">
+        <div class="meta-text" id="newChatHelp">Use country code. We will keep the existing thread logic intact.</div>
+        <button class="button" type="submit" id="startChat">Start New Chat</button>
+        <div class="meta-text" id="newChatError" aria-live="polite"></div>
+      </form>
+    </aside>
+
+    <main class="layout-main">
+      <section class="panel list-panel" aria-label="Conversation list">
+        <header class="panel-header sticky">
+          <p class="eyebrow">Inbox</p>
+          <h2 class="panel-title">Active Chats</h2>
+          <p class="panel-subtitle">Review recent conversations and jump into a thread.</p>
+          <div class="search-row">
+            <label class="visually-hidden" for="chatSearch">Search chats</label>
+            <input class="search-input" id="chatSearch" placeholder="Search patient ID or message">
+          </div>
+          <div class="chips" id="chatFilters" role="tablist" aria-label="Chat filters">
+            <button class="chip active" type="button" data-filter="all">All</button>
+            <button class="chip" type="button" data-filter="urgent">Urgent</button>
+            <button class="chip" type="button" data-filter="high">High</button>
+            <button class="chip" type="button" data-filter="high-moderate">High-mod</button>
+            <button class="chip" type="button" data-filter="unread">Unread</button>
+            <button class="chip" type="button" data-filter="active">Active</button>
+            <button class="chip" type="button" data-filter="closed">Closed</button>
+          </div>
+        </header>
+        <div class="list-scroll" id="chatList">
+          <div class="skeleton-state">
+            <div class="skeleton-lines">
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line short"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel conversation-panel mobile-hidden" id="conversationPanel" aria-label="Conversation">
+        <header class="panel-header sticky">
+          <div class="conversation-header">
+            <div class="header-copy">
+              <button class="ghost-button" type="button" id="backToList" style="display:none; margin-bottom:10px;">Back</button>
+              <div class="chat-tag-row" id="chatTagRow" hidden>
+                <span class="badge badge-success" id="chatStatusBadge"></span>
+                <span class="badge chat-risk-tag" id="chatRiskBadge" hidden></span>
+              </div>
+              <h2 class="panel-title" id="chatTitle">Select a conversation</h2>
+              <p class="panel-subtitle" id="chatSubtitle">Choose a chat from the left to view message history and reply.</p>
+              <p class="meta-text chat-risk-meta" id="chatRiskMeta" hidden></p>
+            </div>
+            <div class="header-actions">
+              <span class="badge badge-accent" id="activeChatPill">No active chat</span>
+              <button class="ghost-button" type="button" id="resolveButton">Mark resolved</button>
+            </div>
+          </div>
+        </header>
+        <div class="thread-scroll" id="chatMain">
+          <div class="thread-stack">
+            <div class="placeholder-state">Select a thread to review the full conversation.</div>
+          </div>
+        </div>
+        <div class="composer">
+          <div class="composer-shell">
+            <label class="visually-hidden" for="chatInput">Type your reply</label>
+            <textarea class="composer-input" id="chatInput" rows="2" placeholder="Reply to the customer. Press Enter to send, Shift+Enter for a new line." disabled></textarea>
+            <div class="composer-actions">
+              <button class="ghost-button" type="button" aria-label="Insert template">Template</button>
+              <button class="button" type="button" id="sendBtn" disabled>Send</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+  <script src="js/rudo-auth.js"></script>
+  <script src="js/rudo-api.js"></script>
+  <script src="js/admin-shell.js"></script>
+  <script src="js/risk-triage.js"></script>
+  <script>
+    AdminShell.setupShell('chats');
+
+    const threadRecords = {};
+    let pendingOperation = null;
+
+        const chatApp = document.getElementById('chatApp');
+    const chatList = document.getElementById('chatList');
+    const chatMain = document.getElementById('chatMain');
+    const chatTitle = document.getElementById('chatTitle');
+    const chatSubtitle = document.getElementById('chatSubtitle');
+    const chatStatusBadge = document.getElementById('chatStatusBadge');
+    const chatTagRow = document.getElementById('chatTagRow');
+    const chatRiskBadge = document.getElementById('chatRiskBadge');
+    const chatRiskMeta = document.getElementById('chatRiskMeta');
+    const activeChatPill = document.getElementById('activeChatPill');
+    const chatCount = document.getElementById('chatCount');
+    const chatSearch = document.getElementById('chatSearch');
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const newNumber = document.getElementById('newNumber');
+    const newChatForm = document.getElementById('newChatForm');
+    const newChatError = document.getElementById('newChatError');
+    const backToList = document.getElementById('backToList');
+    const conversationPanel = document.getElementById('conversationPanel');
+    const resolveButton = document.getElementById('resolveButton');
+
+    let chats = {};
+    let currentChat = null;
+    let currentFilter = 'all';
+
+    function escapeHtml(value) {
+      return AdminShell.escapeHtml(value);
+    }
+
+    function extractPhoneNumber(redisKey) {
+      return threadRecords[redisKey]?.phone || '';
+    }
+
+    function toPatientId(redisKey) {
+      return RiskTriage.toPatientId(threadRecords[redisKey]?.phone || redisKey);
+    }
+
+    function getDisplayText(message) {
+      if (!message) return '';
+      if (typeof message.message === 'string') return message.message.trim();
+      if (typeof message.text === 'string') return message.text.trim();
+      if (typeof message.content === 'string') return message.content.trim();
+      return '';
+    }
+
+    const GENERATED_ID_PATTERN = /DH-\d{4}-[A-Z0-9]{4}/i;
+
+    function resolvePatientId(redisKey, messages) {
+      const generated = (messages || []).find((message) => GENERATED_ID_PATTERN.test(getDisplayText(message)));
+      if (generated) {
+        return getDisplayText(generated).match(GENERATED_ID_PATTERN)[0].toUpperCase();
+      }
+      return toPatientId(redisKey);
+    }
+
+    function redactPhoneNumbers(text) {
+      return String(text || '')
+        .replace(/(?:Phone|Contact Number|Tel|Mobile)\s*:\s*[^\n]+/gi, (line) => line.replace(/:.*/, ': [hidden]'))
+        .replace(/(?:\+?\d[\d\s\-()]{8,}\d)/g, '[hidden]');
+    }
+
+    function formatTimestamp(timestamp) {
+      if (!timestamp) return '';
+      const date = new Date(timestamp);
+      if (Number.isNaN(date.getTime())) return '';
+      return date.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
+    }
+
+    function formatChatTime(timestamp) {
+      if (!timestamp) return '';
+      const date = new Date(timestamp);
+      if (Number.isNaN(date.getTime())) return '';
+      const now = new Date();
+      const diffDays = Math.floor((now - date) / 86400000);
+      if (diffDays <= 0) return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      if (diffDays === 1) return 'Yesterday';
+      if (diffDays < 7) return date.toLocaleDateString([], { weekday: 'short' });
+      return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    }
+
+    function phoneLooksValid(value) {
+      return /^\d{10,15}$/.test(value.replace(/\D/g, ''));
+    }
+
+    function formatPhoneNumber(number) {
+      return String(number || '').replace(/^\+/, '');
+    }
+
+        function formatPlainText(raw) {
+      if (!raw) return '';
+      const safe = escapeHtml(raw.trim());
+      const blocks = safe.split(/\n{2,}/);
+      return blocks.map((block) => {
+        const lines = block.split('\n').map((line) => line.trim());
+        const bulletLines = lines.filter(Boolean);
+        if (bulletLines.length && bulletLines.every((line) => /^[-*•]\s+/.test(line))) {
+          return `<ul>${bulletLines.map((line) => `<li>${line.replace(/^[-*•]\s+/, '')}</li>`).join('')}</ul>`;
+        }
+        if (bulletLines.length && bulletLines.every((line) => /^\d+[\.\)]\s+/.test(line))) {
+          return `<ol>${bulletLines.map((line) => `<li>${line.replace(/^\d+[\.\)]\s+/, '')}</li>`).join('')}</ol>`;
+        }
+        return `<p>${block.replace(/\n/g, '<br>')}</p>`;
+      }).join('');
+    }
+
+    function kvRows(text, keys) {
+      return keys.map((key) => {
+        const match = text.match(new RegExp(`${key}:\\s*(.+)`, 'i'));
+        return match ? `<tr><td>${escapeHtml(key)}</td><td>${escapeHtml(match[1].trim())}</td></tr>` : '';
+      }).join('');
+    }
+
+    function tryFormatStructured(text) {
+      const cleaned = String(text || '').replace(/\*/g, '').trim();
+      if (!cleaned) return '';
+
+      if (cleaned.startsWith('💳 PROOF OF PAYMENT RECEIVED')) {
+        return `<div class="structured-card"><h4>Proof of Payment Received</h4><table>${kvRows(cleaned, ['Order Number', 'Customer', 'Payment Method'])}</table></div>`;
+      }
+      if (cleaned.startsWith('📋 NEW CAKE ORDER')) {
+        return `<div class="structured-card"><h4>New Cake Order</h4><table>${kvRows(cleaned, ['Order Number', 'Customer', 'Email', 'Item', 'Theme', 'Flavor', 'Due Date', 'Due Time', 'Colors', 'Message', 'Special Requests', 'Payment'])}</table></div>`;
+      }
+      if (cleaned.includes('✅ ORDER CONFIRMED')) {
+        return `<div class="structured-card"><h4>Order Confirmed</h4><table>${kvRows(cleaned, ['Order Number', 'Customer', 'Email', 'Item', 'Theme', 'Flavor', 'Due Date', 'Due Time', 'Colors', 'Message', 'Special Requests', 'Payment', 'Total', 'Status'])}</table></div>`;
+      }
+      if (cleaned.includes('🎂 ORDER SUMMARY')) {
+        return `<div class="structured-card"><h4>Order Summary</h4><table>${kvRows(cleaned, ['Selected Item', 'Price', 'Name', 'Flavor', 'Theme', 'Due Time', 'Colors', 'Message', 'Special Requests', 'Payment', 'Note'])}</table></div>`;
+      }
+      return '';
+    }
+
+    function formatMessage(text) {
+      return tryFormatStructured(text) || formatPlainText(text);
+    }
+
+    function getChatState(chatId, messages) {
+      const list = Array.isArray(messages) ? messages : [];
+      const last = list[list.length - 1] || {};
+      const lastText = getDisplayText(last);
+      const lastRole = (last.role || '').toLowerCase();
+      const unread = lastRole === 'user';
+      const closed = threadRecords[chatId]?.status === 'closed';
+      const risk = RiskTriage.assessConversation(list);
+      return {
+        unread,
+        closed,
+        active: !closed,
+        risk,
+        highRisk: Boolean(risk)
+      };
+    }
+
+    function renderEmptyList(message) {
+      chatList.innerHTML = `<div class="empty-state">${escapeHtml(message)}</div>`;
+    }
+
+    async function scanAllKeys() {
+      const rows = await RudoApi.all('/api/conversations');
+      rows.forEach(row => { threadRecords[row.id] = row; });
+      return rows.map(row => row.id);
+    }
+    async function fetchConversation(key) { return threadRecords[key]?.messages || []; }
+
+        function sortChatEntries(entries) {
+      return entries.sort((a, b) => {
+        const aLast = a.messages[a.messages.length - 1];
+        const bLast = b.messages[b.messages.length - 1];
+        const byRecency = new Date(bLast?.timestamp || 0) - new Date(aLast?.timestamp || 0);
+        if (currentFilter === 'all') return byRecency;
+
+        const aRisk = RiskTriage.assessConversation(a.messages);
+        const bRisk = RiskTriage.assessConversation(b.messages);
+        const aRank = aRisk?.priorityRank || 0;
+        const bRank = bRisk?.priorityRank || 0;
+        if (bRank !== aRank) return bRank - aRank;
+        return byRecency;
+      });
+    }
+
+    function renderChatList() {
+      const query = chatSearch.value.trim().toLowerCase();
+      const entries = sortChatEntries(Object.entries(chats).map(([id, messages]) => ({ id, messages }))).filter(({ id, messages }) => {
+        const state = getChatState(id, messages);
+        if (currentFilter === 'unread' && !state.unread) return false;
+        if (currentFilter === 'active' && !state.active) return false;
+        if (currentFilter === 'closed' && !state.closed) return false;
+        if (currentFilter === 'urgent' && state.risk?.priority !== 'URGENT') return false;
+        if (currentFilter === 'high' && state.risk?.priority !== 'HIGH') return false;
+        if (currentFilter === 'high-moderate' && state.risk?.priority !== 'HIGH-MODERATE') return false;
+        if (!query) return true;
+        const patientId = resolvePatientId(id, messages).toLowerCase();
+        const preview = (getDisplayText(messages[messages.length - 1]) || '').toLowerCase();
+        const riskText = state.risk ? `${state.risk.category} ${state.risk.intent} ${state.risk.priorityLabel}`.toLowerCase() : '';
+        return patientId.includes(query) || preview.includes(query) || riskText.includes(query);
+      });
+
+      chatCount.textContent = String(Object.keys(chats).length);
+
+      if (!entries.length) {
+        renderEmptyList('No conversations match the current search or filter.');
+        return;
+      }
+
+      chatList.innerHTML = '';
+      entries.forEach(({ id, messages }) => {
+        const patientId = resolvePatientId(id, messages);
+        const last = messages[messages.length - 1] || {};
+        const preview = redactPhoneNumbers(getDisplayText(last) || 'No messages yet');
+        const state = getChatState(id, messages);
+        const unreadCount = state.unread ? 1 : 0;
+        const riskTag = state.risk
+          ? `<span class="badge ${escapeHtml(state.risk.badge)}" title="${escapeHtml(state.risk.category)} · ${escapeHtml(state.risk.intent)}">${escapeHtml(state.risk.priorityLabel)}</span>`
+          : '<span class="badge badge-success">Routine</span>';
+
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.className = `chat-item${currentChat === id ? ' active' : ''}${state.risk ? ` risk-${state.risk.priority.toLowerCase()}` : ''}`;
+        item.dataset.chat = id;
+        item.innerHTML = `
+          <div class="avatar">${escapeHtml(AdminShell.initials(patientId))}</div>
+          <div class="chat-meta">
+            <div class="chat-topline">
+              <div class="chat-name">${escapeHtml(patientId)}</div>
+            </div>
+            <div class="chat-preview">${escapeHtml(state.risk ? `${state.risk.intent} — ${preview}` : preview)}</div>
+            <div class="chat-status">
+              ${riskTag}
+              <span class="badge ${state.closed ? 'badge-warning' : 'badge-success'}">${state.closed ? 'Closed' : 'Active'}</span>
+              ${state.unread ? '<span class="badge badge-accent">Needs reply</span>' : '<span class="meta-text">Updated</span>'}
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div class="chat-time">${escapeHtml(formatChatTime(last.timestamp))}</div>
+            ${unreadCount ? `<div class="count-pill" style="margin-top:10px;">${unreadCount}</div>` : ''}
+          </div>
+        `;
+        item.addEventListener('click', () => switchChat(id));
+        chatList.appendChild(item);
+      });
+    }
+
+    function renderConversationHeader(chatId, messages) {
+      const patientId = resolvePatientId(chatId, messages);
+      const state = getChatState(chatId, messages);
+      chatTagRow.hidden = false;
+      chatTitle.textContent = `Conversation with ${patientId}`;
+      chatSubtitle.textContent = `${messages.length} message${messages.length === 1 ? '' : 's'} in this thread`;
+      chatStatusBadge.className = `badge ${state.closed ? 'badge-warning' : state.unread ? 'badge-accent' : 'badge-success'}`;
+      chatStatusBadge.textContent = state.closed ? 'Closed thread' : state.unread ? 'Awaiting reply' : 'Active thread';
+
+      if (state.risk) {
+        chatRiskBadge.className = `badge chat-risk-tag ${state.risk.badge}`;
+        chatRiskBadge.textContent = state.risk.priorityLabel;
+        chatRiskBadge.hidden = false;
+        chatRiskMeta.textContent = `${state.risk.category} · ${state.risk.intent}`;
+        chatRiskMeta.hidden = false;
+      } else {
+        chatRiskBadge.className = 'badge chat-risk-tag badge-success';
+        chatRiskBadge.textContent = 'Routine';
+        chatRiskBadge.hidden = false;
+        chatRiskMeta.hidden = true;
+      }
+
+      activeChatPill.textContent = patientId;
+    }
+
+    function renderChat(chatId) {
+      const messages = chats[chatId] || [];
+      renderConversationHeader(chatId, messages);
+
+      if (!messages.length) {
+        chatMain.innerHTML = '<div class="thread-stack"><div class="empty-state">No messages in this conversation yet.</div></div>';
+        return;
+      }
+
+      let lastDate = '';
+      const stack = document.createElement('div');
+      stack.className = 'thread-stack';
+
+      messages.forEach((message) => {
+        const text = redactPhoneNumbers(getDisplayText(message));
+        if (!text) return;
+        const timestamp = message.timestamp || new Date().toISOString();
+        const dateKey = new Date(timestamp).toDateString();
+
+        if (dateKey !== lastDate) {
+          const divider = document.createElement('div');
+          divider.className = 'date-divider';
+          divider.textContent = new Date(timestamp).toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+          stack.appendChild(divider);
+          lastDate = dateKey;
+        }
+
+        const row = document.createElement('div');
+        const outgoing = (message.role || '').toLowerCase() !== 'user';
+        row.className = `message-row ${outgoing ? 'outgoing' : 'incoming'}`;
+        row.innerHTML = `
+          <article class="message-card">
+            ${formatMessage(text)}
+            <small>${escapeHtml(message.delivery_status || 'received')}</small>
+            <div class="message-meta">${escapeHtml(formatTimestamp(timestamp))}</div>
+          </article>
+        `;
+        stack.appendChild(row);
+      });
+
+      chatMain.innerHTML = '';
+      chatMain.appendChild(stack);
+      chatMain.scrollTop = chatMain.scrollHeight;
+    }
+
+    function switchChat(chatId) {
+      currentChat = chatId;
+      renderChatList();
+      renderChat(chatId);
+      chatInput.disabled = false;
+      sendBtn.disabled = false;
+      conversationPanel.classList.remove('mobile-hidden');
+      if (window.innerWidth <= 720) {
+        chatApp.classList.add('chat-view');
+        backToList.style.display = 'inline-flex';
+      }
+    }
+
+    function updateChatPreview(chatId, text) {
+      const list = chats[chatId] || [];
+      if (!list.length) return;
+      const last = list[list.length - 1];
+      last.message = text;
+      last.timestamp = new Date().toISOString();
+      renderChatList();
+    }
+
+    async function loadChats() {
+      try {
+        chatList.innerHTML = '<div class="skeleton-state"><div class="skeleton-lines"><div class="skeleton-line"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div></div>';
+        const keys = await scanAllKeys();
+        const loaded = {};
+        await Promise.all(keys.map(async (key) => {
+          const messages = await fetchConversation(key);
+          if (messages.length) loaded[key] = messages;
+        }));
+        chats = loaded;
+        renderChatList();
+        const firstId = Object.keys(loaded)[0];
+        if (firstId) {
+          switchChat(firstId);
+        } else {
+          currentChat = null;
+          chatMain.innerHTML = '<div class="thread-stack"><div class="empty-state">No conversations found yet. Start a new chat from the sidebar.</div></div>';
+          conversationPanel.classList.remove('mobile-hidden');
+        }
+      } catch (error) {
+        chatList.innerHTML = '<div class="error-state">There was a problem loading chats. Refresh the page and try again.</div>';
+        chatMain.innerHTML = '<div class="thread-stack"><div class="error-state">Conversation history could not be loaded.</div></div>';
+      }
+    }
+
+    async function sendMessage() {
+      const value = chatInput.value.trim();
+      if (!value || !currentChat) return;
+      sendBtn.disabled = true; sendBtn.textContent = 'Queuing...';
+      // Retain operation ID after timeout so an explicit retry cannot enqueue twice.
+      if (!pendingOperation || pendingOperation.chat !== currentChat || pendingOperation.text !== value)
+        pendingOperation = { id: crypto.randomUUID(), chat: currentChat, text: value };
+      try {
+        const result = await RudoApi.request(`/api/conversations/${currentChat}/messages`, {
+          method: 'POST', headers: { 'Idempotency-Key': pendingOperation.id }, body: JSON.stringify({ message: value })
+        });
+        chatInput.value = ''; pendingOperation = null;
+        const row = await RudoApi.request(`/api/conversations/${currentChat}`);
+        threadRecords[row.id] = row; chats[row.id] = row.messages;
+        renderChat(currentChat); renderChatList();
+        chatSubtitle.textContent = `Message ${result.status}; delivery is handled by the server worker.`;
+      } catch (error) { chatSubtitle.textContent = error.message + ' Retry retains the same operation ID.'; }
+      finally { sendBtn.disabled = false; sendBtn.textContent = 'Send'; }
+    }
+    newChatForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const raw = newNumber.value.trim();
+      if (!/^\+?[1-9]\d{9,14}$/.test(raw)) { newChatError.textContent = 'Use a full international number, including country code.'; return; }
+      try {
+        const me = await RudoApi.request('/api/me');
+        if (me.facilities.length !== 1) throw new Error('A facility must be selected before starting a conversation; contact your administrator.');
+        const row = await RudoApi.request('/api/conversations', { method: 'POST', body: JSON.stringify({ phone: raw, facilityId: me.facilities[0] }) });
+        threadRecords[row.id] = row; chats[row.id] = row.messages || []; newNumber.value = ''; newChatError.textContent = '';
+        renderChatList(); switchChat(row.id);
+      } catch (error) { newChatError.textContent = error.message; }
+    });
+
+        sendBtn.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+      }
+    });
+
+    chatSearch.addEventListener('input', renderChatList);
+
+    document.getElementById('chatFilters').addEventListener('click', (event) => {
+      const button = event.target.closest('[data-filter]');
+      if (!button) return;
+      currentFilter = button.dataset.filter;
+      document.querySelectorAll('#chatFilters .chip').forEach((chip) => chip.classList.toggle('active', chip === button));
+      renderChatList();
+    });
+
+    backToList.addEventListener('click', () => {
+      chatApp.classList.remove('chat-view');
+      backToList.style.display = 'none';
+    });
+
+    resolveButton.addEventListener('click', async () => {
+      if (!currentChat) return;
+      try {
+        const row = await RudoApi.request(`/api/conversations/${currentChat}`, { method: 'PATCH', body: JSON.stringify({ status: 'closed', version: threadRecords[currentChat].version }) });
+        threadRecords[row.id] = { ...threadRecords[row.id], ...row }; renderChat(currentChat); renderChatList();
+      } catch (error) { chatSubtitle.textContent = error.message; }
+    });
+
+        if (window.innerWidth > 720) {
+      conversationPanel.classList.remove('mobile-hidden');
+    }
+
+    loadChats();
+  </script>
+</body>
+</html>
