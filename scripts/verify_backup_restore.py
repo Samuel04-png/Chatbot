@@ -23,7 +23,7 @@ sys.path.insert(0, str(ROOT))
 from scripts.backup_split import split  # noqa: E402
 
 PGBIN = Path(os.environ.get('RUDO_TEST_PGBIN', '/opt/homebrew/opt/postgresql@17/bin'))
-LOCAL = os.environ.get('RUDO_RESTORE_LOCAL_URL', 'postgresql://postgres:postgres@127.0.0.1:54322/postgres')
+LOCAL = os.environ.get('RUDO_RESTORE_LOCAL_URL', 'postgresql://postgres:postgres@127.0.0.1:54422/postgres')
 SCRATCH = 'rudo_restore_check'
 NAME = re.compile(r'^[A-Za-z0-9_]+\.[A-Za-z0-9_]+$')
 BOT_TABLES = ['public.users', 'public.messages', 'public.referrals', 'public.orders', 'public.kv', 'public.user_state']

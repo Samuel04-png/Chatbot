@@ -36,6 +36,7 @@ def clear_source(dsn):
 
 
 MIGRATION=ROOT/'supabase/migrations/20261121120000_rudo_staff_control.sql'
+REPLIES_MIGRATION=ROOT/'supabase/migrations/20261121150000_rudo_staff_replies.sql'
 FACILITIES=[('account-one','facility-a','Facility A'),('account-one','facility-b','Facility B'),
             ('account-two','facility-a','Account two Facility A'),('account-two','facility-b','Account two Facility B'),
             ('account-empty','facility-empty','Empty facility')]
@@ -56,7 +57,8 @@ def bootstrap(dsn=LOCAL_DSN):
     clear_source(dsn)
     with psycopg.connect(dsn) as conn:
         conn.execute((ROOT/'staging/observer/source_fixture.sql').read_text())
-        conn.execute(MIGRATION.read_text())  # The exact production migration file.
+        conn.execute(MIGRATION.read_text())  # The exact production migration files.
+        conn.execute(REPLIES_MIGRATION.read_text())
         for account,facility,name in FACILITIES:
             conn.execute('INSERT INTO observer_control.facilities(source_id,account_id,facility_id,display_name) VALUES(%s,%s,%s,%s)',
                          (SOURCE,account,facility,name))
@@ -103,7 +105,7 @@ def bootstrap(dsn=LOCAL_DSN):
 
 def adapter(dsn=LOCAL_DSN):
     reader=make_conninfo(dsn,user='rudo_observer');audit=make_conninfo(dsn,user='rudo_observer_audit')
-    return Observer(reader,AccessAudit(audit),SOURCE,cursor_secret=b'synthetic-test-cursor-secret')
+    return Observer(reader,AccessAudit(audit),SOURCE,cursor_secret=b'synthetic-test-cursor-secret',replies=True)
 
 
 def snapshot(dsn=LOCAL_DSN):
@@ -143,3 +145,7 @@ class SyntheticBot:
 
 def admin_dsn(dsn=LOCAL_DSN):
     return make_conninfo(dsn,user='rudo_staff_admin')
+
+
+def sender_dsn(dsn=LOCAL_DSN):
+    return make_conninfo(dsn,user='rudo_sender')

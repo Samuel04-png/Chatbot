@@ -80,6 +80,16 @@ try {
   await b.evaluate("document.getElementById('googleSignIn').click()");
   await b.wait("['/observer.html','/index2.html'].includes(location.pathname) && document.querySelectorAll('.conversation-card').length===5", 'google');
   checks.push('Google sign-in path');
+  await b.evaluate("[...document.querySelectorAll('.conversation-card')].find(c=>c.textContent.includes('260000000106')).click()");
+  await b.wait("!document.getElementById('reply').hidden && document.getElementById('reply-send').disabled && document.getElementById('reply-note').textContent.includes('24 hours')", 'window closed');
+  checks.push('reply box explains the WhatsApp 24-hour rule');
+  await b.evaluate("[...document.querySelectorAll('.conversation-card')].find(c=>c.textContent.includes('260000000101')).click()");
+  await b.wait("!document.getElementById('reply').hidden && !document.getElementById('reply-send').disabled && document.querySelectorAll('.message').length>0", 'reply open');
+  assert.equal(await b.evaluate("document.getElementById('mode-badge').textContent"), 'Staff replies on');
+  await value('reply-text', 'Synthetic staff reply from the browser'); await b.evaluate("document.getElementById('reply').requestSubmit()");
+  await b.wait("document.getElementById('reply-note').textContent==='Sent.' && [...document.querySelectorAll('.message.staff')].some(m=>m.textContent.includes('Staff · Synthetic admin') && m.textContent.includes('Synthetic staff reply from the browser'))", 'reply sent');
+  assert.equal(await b.evaluate("document.getElementById('reply-text').value"), '');
+  checks.push('admin sends a staff reply; it appears in the history labelled with their name');
   const shot = await b.send('Page.captureScreenshot', { format: 'png' }); await writeFile('.local/firebase-dashboard.png', Buffer.from(shot.data, 'base64'));
   await b.navigate('/staff.html'); await b.wait("!document.getElementById('admin').hidden", 'staff');
   const staffShot = await b.send('Page.captureScreenshot', { format: 'png' }); await writeFile('.local/staff-page.png', Buffer.from(staffShot.data, 'base64'));

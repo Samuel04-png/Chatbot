@@ -32,6 +32,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 MIGRATION = ROOT / 'supabase/migrations/20261121120000_rudo_staff_control.sql'
 ROLLBACK = ROOT / 'supabase/rollback/20261121120000_rudo_staff_control.down.sql'
+REPLIES = ROOT / 'supabase/migrations/20261121150000_rudo_staff_replies.sql'
+REPLIES_ROLLBACK = ROOT / 'supabase/rollback/20261121150000_rudo_staff_replies.down.sql'
 TABLES = ('users', 'messages', 'referrals', 'orders', 'kv', 'user_state')
 SOURCE = 'rehearsal-source'
 
@@ -103,8 +105,11 @@ def main():
     # 3. Apply exactly as the release will: one transaction, role postgres.
     with psycopg.connect(db) as conn:
         conn.execute(MIGRATION.read_text())
+    with psycopg.connect(db) as conn:
+        conn.execute(REPLIES.read_text())
     checks['migration_applied_as_postgres'] = True
-    passwords = {r: secrets.token_urlsafe(24) for r in ('rudo_observer', 'rudo_observer_audit', 'rudo_staff_admin')}
+    checks['replies_migration_applied_as_postgres'] = True
+    passwords = {r: secrets.token_urlsafe(24) for r in ('rudo_observer', 'rudo_observer_audit', 'rudo_staff_admin', 'rudo_sender')}
     with psycopg.connect(db, autocommit=True) as conn:
         for role, password in passwords.items():
             # Same method as the release: only a locally computed SCRAM verifier reaches the server.
@@ -125,13 +130,15 @@ def main():
             and diff['policies_added'] == [f'{t}.rudo_observer_read' for t in ('messages', 'orders', 'referrals', 'users')]
             and all(':rudo_observer:SELECT' in c for c in added_columns)
             and (diff['schema_acl_change'] == 'unchanged' or 'rudo_observer=U' in diff['schema_acl_change'][1]))
+        checks['policies_unchanged_by_replies_migration'] = sorted(set(after['policies']) - set(before['policies'])) == [
+            f'{t}.rudo_observer_read' for t in ('messages', 'orders', 'referrals', 'users')]
         for role in ('anon', 'authenticated', 'service_role'):
             checks[f'{role}_has_no_observer_control_access'] = not conn.execute(
                 "SELECT has_schema_privilege(%s,'observer_control','USAGE')", (role,)).fetchone()[0]
         # Facilities, one staff admin (Supabase login created below), mappings for two of three phones.
         conn.execute("INSERT INTO observer_control.facilities(source_id,account_id,facility_id,display_name) VALUES"
                      "(%s,'rudo-whatsapp','chelstone-clinic','Chelstone Clinic'),(%s,'rudo-whatsapp','ngombe-clinic','Ngombe Clinic')", (SOURCE, SOURCE))
-    for role in ('rudo_observer', 'rudo_observer_audit', 'rudo_staff_admin'):
+    for role in ('rudo_observer', 'rudo_observer_audit', 'rudo_staff_admin', 'rudo_sender'):
         dsn = make_conninfo(db, user=role, password=passwords[role])
         with psycopg.connect(dsn, autocommit=True) as conn:
             for statement in ('SELECT message_en FROM public.messages', 'SELECT * FROM public.kv', 'SELECT address FROM public.orders',
@@ -185,12 +192,16 @@ def main():
         checks['bot_service_role_round_trip_with_dashboard_active'] = bot_round_trip(conn)
     # 6. Rollback, compare, and prove the cycle is repeatable.
     with psycopg.connect(db, autocommit=True) as conn:
+        conn.execute(REPLIES_ROLLBACK.read_text())
         conn.execute(ROLLBACK.read_text())
         checks['rollback_restores_bot_table_state'] = state(conn) == before
         checks['rollback_keeps_bot_rows'] = conn.execute('SELECT count(*) FROM public.messages').fetchone()[0] == 6
     with psycopg.connect(db) as conn:
         conn.execute(MIGRATION.read_text())
+    with psycopg.connect(db) as conn:
+        conn.execute(REPLIES.read_text())
     with psycopg.connect(db, autocommit=True) as conn:
+        conn.execute(REPLIES_ROLLBACK.read_text())
         conn.execute(ROLLBACK.read_text())
         checks['second_apply_and_rollback_cycle'] = state(conn) == before
         checks['bot_service_role_round_trip_after_rollback'] = bot_round_trip(conn)

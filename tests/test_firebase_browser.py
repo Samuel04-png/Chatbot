@@ -4,7 +4,10 @@ import base64,json,subprocess
 from pathlib import Path
 from app import create_app
 from conftest import TEST_DSN
-from rudo.synthetic import SyntheticVerifier,admin_dsn,bootstrap,clear_source
+from rudo.synthetic import PHONES,SOURCE,SyntheticVerifier,admin_dsn,bootstrap,clear_source,sender_dsn
+from rudo.replies import StaffReplies
+from test_staff_replies import FakeSender
+import psycopg
 
 
 def drive(app,script,env=None):
@@ -35,10 +38,15 @@ def drive(app,script,env=None):
 def test_firebase_sign_in_staff_invitation_and_approval_in_browser():
     observer=bootstrap(TEST_DSN)
     try:
-        app=create_app({'MODE':'observer','TESTING':True,'FIREBASE_PROJECT_ID':'dawa-ca263','STAFF_ADMIN_DATABASE_URL':admin_dsn(TEST_DSN),'ALLOWED_ORIGIN':'http://127.0.0.1:5051'},
+        sender=FakeSender()
+        with psycopg.connect(TEST_DSN) as conn:
+            conn.execute("INSERT INTO public.messages(phone,role,message) VALUES(%s,'user','Synthetic recent patient message')",(PHONES['a'],))
+        app=create_app({'MODE':'observer','TESTING':True,'FIREBASE_PROJECT_ID':'dawa-ca263','STAFF_ADMIN_DATABASE_URL':admin_dsn(TEST_DSN),'ALLOWED_ORIGIN':'http://127.0.0.1:5051',
+                        'STAFF_REPLIES':StaffReplies(sender_dsn(TEST_DSN),SOURCE,sender,enabled=True)},
                        observer=observer,verifier=SyntheticVerifier())
         result=drive(app,'scripts/test_firebase_browser.mjs')
         Path('.local/firebase-browser-results.json').write_text(json.dumps(result,indent=2)+'\n')
-        assert result['passed']==11 and result['pageErrors']==[]
+        assert result['passed']==13 and result['pageErrors']==[]
+        assert sender.calls==[(PHONES['a'],'Synthetic staff reply from the browser')]
     finally:
         clear_source(TEST_DSN)

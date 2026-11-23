@@ -1,5 +1,4 @@
-"""One internal staff id per person; Firebase and Supabase logins map to it. Import is staff-only,
-idempotent and leaves no secrets. Runs against the exact production migration file."""
+"""One internal staff id per person; Firebase and Supabase logins map to it. Account import: tests/test_firebase_migration.py. Runs against the exact production migration file."""
 from uuid import uuid4
 
 import psycopg
@@ -10,14 +9,12 @@ from conftest import TEST_DSN
 from rudo.auth import supabase_issuer
 from rudo.errors import ApiError
 from rudo.observer import reference
-from rudo.staff_migration import HashParams, LinkStore, classify, firebase_scrypt, run_import
+from rudo.staff_migration import LinkStore
 from rudo.synthetic import ISSUER, PHONES, SOURCE, SyntheticVerifier, bootstrap, clear_source, snapshot, staff_id
-from scripts import migrate_staff_auth
 
 SB_URL = 'http://127.0.0.1:54321'
 SB_ISSUER = supabase_issuer(SB_URL)
 PROJECT = 'synthetic-test'  # ISSUER == https://securetoken.google.com/synthetic-test
-PARAMS = HashParams(b'\x01' * 64, b'\x07', 8, 14)
 
 
 class TwoProviders:
@@ -119,87 +116,6 @@ def test_restricted_roles_cannot_read_or_forge_staff_metadata(observer):
     # The admin login can call nothing without an active-admin identity context.
     with psycopg.connect(make_conninfo(TEST_DSN, user='rudo_staff_admin')) as conn, pytest.raises(psycopg.errors.InsufficientPrivilege):
         conn.execute('SELECT observer_control.admin_overview()')
-
-
-class FakeAdmin:
-    def __init__(self, users=()):self.existing,self.created=list(users),[]
-    def users(self):return iter(self.existing)
-    def create(self, body):
-        user = {'id': str(uuid4()), 'email': body['email'], 'app_metadata': body['app_metadata']}
-        self.created.append(body);self.existing.append(user);return user
-
-
-def firebase_user(uid, email, providers=('password',), verified=True, disabled=False, hashed=True):
-    salt = 'c2FsdHNhbHQ='
-    return {'uid': uid, 'email': email, 'email_verified': verified, 'disabled': disabled, 'display_name': uid,
-            'providers': list(providers),
-            'password_hash': firebase_scrypt('pw-' + uid, salt, PARAMS) if hashed and 'password' in providers else None,
-            'password_salt': salt}
-
-
-USERS = [firebase_user('operator', 'operator@example.test'),
-         firebase_user('admin', 'admin@example.test', providers=('google.com',)),
-         firebase_user('analyst', 'dup@example.test'), firebase_user('second-account', 'DUP@example.test'),
-         firebase_user('disabled', 'disabled@example.test'),
-         firebase_user('other', 'other@example.test', disabled=True),
-         firebase_user('empty', 'different@example.test'),
-         firebase_user('patient-or-public-user', 'public@example.test')]
-
-
-def test_inventory_is_staff_only_and_explains_every_hold(observer):
-    report = classify(USERS, LinkStore(TEST_DSN).staff_rows(), PROJECT)
-    assert [c['uid'] for c in report['candidates']] == ['operator', 'admin']
-    assert report['candidates'][0]['staff_id'] == str(sid('operator'))
-    assert {h['uid']: h['reasons'] for h in report['held']} == {
-        'analyst': ['email_differs_from_staff_record', 'duplicate_email'],
-        'second-account': ['email_differs_from_staff_record', 'duplicate_email'],
-        'disabled': ['staff_suspended'], 'other': ['firebase_user_disabled'], 'empty': ['email_differs_from_staff_record']}
-    assert report['excluded_non_staff'] == 1 and 'public@example.test' not in str(report)
-    assert '$fbscrypt$' not in str(report) and "'password_hash'" not in str(report)
-
-
-def test_import_dry_run_then_execute_is_idempotent_and_maps_to_staff_ids(observer, client):
-    links, admin = LinkStore(TEST_DSN), FakeAdmin([{'id': str(uuid4()), 'email': 'unrelated@example.test'}])
-    before = snapshot(TEST_DSN)
-    report = classify(USERS, links.staff_rows(), PROJECT)
-    assert {r['result'] for r in run_import(report, USERS, PARAMS, admin, links, SB_URL, 'a')} == {'would_create'} and not admin.created
-    done = run_import(report, USERS, PARAMS, admin, links, SB_URL, 'a', execute=True)
-    assert {r['uid']: (r['result'], r['password']) for r in done} == {
-        'operator': ('created_and_linked', 'firebase_scrypt'), 'admin': ('created_and_linked', 'none (OAuth only)')}
-    assert {r['result'] for r in run_import(report, USERS, PARAMS, admin, links, SB_URL, 'a', execute=True)} == {'already_linked'}
-    assert len(admin.created) == 2
-    login = links.linked_subject(SB_ISSUER, sid('operator'))
-    assert client.get('/api/me', headers=bearer('sb:' + login)).json['staffId'] == str(sid('operator'))
-    assert snapshot(TEST_DSN) == before  # Bot tables untouched.
-
-
-def test_import_recovers_interrupted_run_and_refuses_email_collisions(observer):
-    links = LinkStore(TEST_DSN)
-    orphan = {'id': str(uuid4()), 'email': 'operator@example.test', 'app_metadata': {'firebase_uid': 'operator', 'firebase_project': PROJECT}}
-    squatter = {'id': str(uuid4()), 'email': 'ADMIN@example.test', 'app_metadata': {}}
-    admin = FakeAdmin([orphan, squatter])
-    report = classify(USERS, links.staff_rows(), PROJECT)
-    results = {r['uid']: r['result'] for r in run_import(report, USERS, PARAMS, admin, links, SB_URL, 'a', execute=True)}
-    assert results == {'operator': 'linked_existing', 'admin': 'conflict_email_exists'} and admin.created == []
-    assert links.linked_subject(SB_ISSUER, sid('operator')) == orphan['id']
-    assert links.linked_subject(SB_ISSUER, sid('admin')) is None
-    with pytest.raises(ValueError):run_import(report, USERS, PARAMS, admin, links, SB_URL, 'a', only_uid='analyst')
-
-
-def test_migration_cli_guards_and_single_account_first(observer, capsys):
-    env = {'SUPABASE_URL': SB_URL, 'FIREBASE_PROJECT_ID': PROJECT, 'RUDO_CONTROL_ADMIN_DATABASE_URL': TEST_DSN,
-           'FIREBASE_SIGNER_KEY': 'AQ==', 'FIREBASE_SALT_SEPARATOR': 'Bw==', 'FIREBASE_ROUNDS': '8', 'FIREBASE_MEM_COST': '14'}
-    admin = FakeAdmin()
-    for argv, extra in ((['--execute', '--actor', 'a'], {}),
-                        (['--execute', '--confirm-project', '127', '--actor', 'a'], {'RUDO_AUTH_IMPORT_ALLOWED_REF': 'other'})):
-        with pytest.raises(SystemExit):
-            migrate_staff_auth.main(argv, env={**env, **extra}, firebase_users=USERS, admin=admin)
-    assert migrate_staff_auth.main(['--actor', 'a'], env=env, firebase_users=USERS, admin=admin)['mode'] == 'dry-run' and not admin.created
-    summary = migrate_staff_auth.main(['--execute', '--confirm-project', '127.0.0.1', '--only-uid', 'operator', '--actor', 'a'],
-                                      env={**env, 'RUDO_AUTH_IMPORT_ALLOWED_REF': '127.0.0.1'}, firebase_users=USERS, admin=admin)
-    assert [r['result'] for r in summary['results']] == ['created_and_linked'] and len(admin.created) == 1
-    printed = capsys.readouterr().out
-    assert '$fbscrypt$' not in printed and '"password_hash"' not in printed
 
 
 def test_link_store_refuses_remote_targets():

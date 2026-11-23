@@ -103,8 +103,9 @@ class AccessAudit:
 
 
 class Observer:
-    def __init__(self,dsn,audit,source_id,cursor_secret=None,allow_remote=False):
+    def __init__(self,dsn,audit,source_id,cursor_secret=None,allow_remote=False,replies=False):
         self.dsn,self.audit,self.source_id,self.allow_remote=dsn,audit,source_id,allow_remote
+        self.replies=replies  # True once the staff-replies migration is installed and replies are enabled.
         self.cursor_secret=cursor_secret or secrets.token_bytes(32)
 
     @contextmanager
@@ -203,13 +204,23 @@ class Observer:
             rows=conn.execute('''SELECT id,role,message,created_at AS timestamp FROM public.messages
                                  WHERE phone=%s AND (%s::bigint IS NULL OR id<%s) AND (%s::bigint IS NULL OR id<=%s)
                                  ORDER BY id DESC LIMIT %s''',(phone,before,before,anchor,anchor,limit+1)).fetchall()
+            notes,attempts,window={},[],None
+            if self.replies:
+                for note in conn.execute('SELECT * FROM observer_control.reply_annotations(%s)',(phone,)).fetchall():
+                    if note['message_id'] is not None:notes[note['message_id']]=note['staff_name']
+                    else:attempts.append({'staff_name':note['staff_name'],'status':note['status'],'message':note['body'],
+                                          'timestamp':note['created_at']})
+                window=conn.execute('SELECT observer_control.reply_window(%s) AS w',(phone,)).fetchone()['w']
         more=len(rows)>limit;rows=rows[:limit]
         if anchor is None and rows:anchor=rows[0]['id']
         next_cursor=self._cursor(context,str(rows[-1]['id']),str(anchor)) if more else None
-        for row in rows:row.update(id=str(row['id']),delivery_status='unknown',provider_id=None)
+        for row in rows:
+            row['sent_by_staff']=notes.get(row['id'])
+            row.update(id=str(row['id']),delivery_status='unknown',provider_id=None)
         self._record(identity,'history',len(rows),conversation_id)
         return {'id':conversation_id,'phone':phone,**scope,'messages':list(reversed(rows)),
-                'nextCursor':next_cursor,'snapshotMaxId':str(anchor) if anchor is not None else None,'coverageNotice':HISTORY_NOTICE}
+                'nextCursor':next_cursor,'snapshotMaxId':str(anchor) if anchor is not None else None,'coverageNotice':HISTORY_NOTICE,
+                'replyAttempts':attempts,'replyWindow':window}
 
     def records(self,identity,table,limit=25,cursor=None,account=None,facility=None,status=None):
         if table not in ('orders','referrals'):raise ValueError('unsupported projection')

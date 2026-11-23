@@ -1,12 +1,12 @@
 (() => {
   const $ = id => document.getElementById(id);
   const unknown = value => value === null || value === undefined ? 'Unknown / not recorded' : String(value);
-  let view = 'conversations', member = null, cursor = null, activeThread = null, historyCursor = null;
+  let view = 'conversations', member = null, cursor = null, activeThread = null, historyCursor = null, replyWindow = null, replyRequest = null;
   let pageEpoch = 0, threadEpoch = 0, identityEpoch = 0;
   const messages = new Map();
   function text(tag, content, cls) { const node = document.createElement(tag); node.textContent = content; if (cls) node.className = cls; return node; }
   function state(id, message, error = false) { $(id).textContent = message; $(id).classList.toggle('error', error); }
-  function clearThread() { ++threadEpoch; activeThread = null; messages.clear(); $('messages').replaceChildren(); $('thread').hidden = true; $('older').hidden = true; $('workspace').classList.remove('has-thread'); }
+  function clearThread() { ++threadEpoch; activeThread = null; messages.clear(); $('messages').replaceChildren(); $('attempts').replaceChildren(); $('reply').hidden = true; $('reply-text').value = ''; replyRequest = null; $('thread').hidden = true; $('older').hidden = true; $('workspace').classList.remove('has-thread'); }
   function resetData() { ++pageEpoch; clearThread(); cursor = null; $('records').replaceChildren(); $('more').hidden = true; $('updated').textContent = 'No source read completed yet.'; }
   function params(extra = {}) {
     const p = new URLSearchParams({ limit: '25', ...extra });
@@ -63,7 +63,7 @@
       else {
         data.items.forEach(row => $('records').append(view === 'conversations' ? renderConversation(row) : renderRecord(row)));
         cursor = data.nextCursor; $('more').hidden = !cursor;
-        state('page-state', $('records').children.length ? 'Source records loaded. Read-only access.' : 'No authorized source records match these filters.');
+        state('page-state', $('records').children.length ? (member?.canReply ? 'Source records loaded.' : 'Source records loaded. Read-only access.') : 'No authorized source records match these filters.');
         if (!$('records').children.length) $('records').append(text('p', 'No source records found.', 'empty'));
       }
       $('updated').textContent = `Last successful source read: ${new Date().toISOString()}. Refresh to observe new source writes.`;
@@ -78,10 +78,31 @@
     $('messages').replaceChildren();
     [...messages.values()].sort((a,b) => BigInt(a.id) < BigInt(b.id) ? -1 : 1).forEach(message => {
       const article = text('article', '', 'message ' + (message.role === 'bot' ? 'bot' : 'user')); article.dataset.sourceId = message.id;
-      article.append(text('strong', `${message.role === 'bot' ? 'Bot / source' : 'User / source'} · source message ${message.id}`),
+      const who = message.sent_by_staff ? `Staff · ${message.sent_by_staff}` : message.role === 'bot' ? 'Bot / source' : 'User / source';
+      if (message.sent_by_staff) article.classList.add('staff');
+      article.append(text('strong', `${who} · source message ${message.id}`),
         text('p', message.message), text('small', `${unknown(message.timestamp)} · Delivery unknown · Provider ID not recorded`));
       $('messages').append(article);
     });
+  }
+  function renderReplyState(result) {
+    replyWindow = result ? result.replyWindow : null;
+    $('attempts').replaceChildren();
+    (result?.replyAttempts || []).forEach(a => {
+      const note = a.status === 'failed' ? 'NOT SENT: WhatsApp rejected it' : a.status === 'unknown' || a.status === 'sending' ? 'DELIVERY UNCERTAIN: check WhatsApp before resending' : a.status;
+      const box = text('article', '', 'message attempt'); box.append(text('strong', `Staff · ${a.staff_name} · ${note}`), text('p', a.message || ''), text('small', unknown(a.timestamp)));
+      $('attempts').append(box);
+    });
+    const form = $('reply'); form.hidden = !(member?.canReply && activeThread);
+    if (form.hidden) return;
+    const last = replyWindow?.last_user_message_at ? new Date(replyWindow.last_user_message_at) : null;
+    let reason = '';
+    if (!replyWindow) reason = 'Replies are unavailable for this conversation.';
+    else if (replyWindow.agent_session_active) reason = 'A WhatsApp agent is handling this patient right now.';
+    else if (!last || Date.now() - last.getTime() > 24 * 3600 * 1000) reason = 'The patient last wrote more than 24 hours ago. WhatsApp only allows replies within 24 hours of their last message.';
+    $('reply-text').disabled = $('reply-send').disabled = Boolean(reason);
+    $('reply-note').textContent = reason || 'The bot will still answer the patient\'s next message automatically.';
+    $('reply-note').classList.toggle('error', Boolean(reason));
   }
   async function openThread(row, older = false) {
     const epoch = ++threadEpoch, identity = identityEpoch;
@@ -94,7 +115,7 @@
       const result = await RudoApi.request(`/api/conversations/${row.id}?${p}`);
       if (epoch !== threadEpoch || identity !== identityEpoch) return;
       result.messages.forEach(message => messages.set(message.id, message)); historyCursor = result.nextCursor;
-      renderMessages(); $('older').hidden = !historyCursor;
+      renderMessages(); renderReplyState(result); $('older').hidden = !historyCursor;
       state('thread-state', messages.size ? 'Captured source history. Refresh replaces this view with current source records.' : 'No captured messages in source; other WhatsApp interactions may exist.');
     } catch (error) {
       if (epoch !== threadEpoch || identity !== identityEpoch) return;
@@ -120,9 +141,28 @@
       const nextMember = await RudoApi.request('/api/me'); if (epoch !== identityEpoch) return; member = nextMember;
       $('identity').textContent = `${member.displayName || member.email || member.subject} · ${member.role} · ${member.scopes.length} approved facilit${member.scopes.length === 1 ? 'y' : 'ies'}`;
       $('staff-link').hidden = member.role !== 'admin';
+      $('mode-badge').textContent = member.canReply ? 'Staff replies on' : 'Read-only observer';
+      $('mode-note').textContent = member.canReply ? 'Replies are sent from the Rudo WhatsApp number and saved to the conversation. The bot keeps answering automatically.' : 'The existing bot remains the source owner. Sending, resolving and record editing are disabled.';
       populateScopes(member.scopes); selectView();
     } catch (error) { if (epoch === identityEpoch) { member = null; state('page-state', error.message, true); $('identity').textContent = 'Staff access unavailable'; } }
   }
+  $('reply-text').addEventListener('input', () => { replyRequest = null; });  // Edited text = a new request.
+  $('reply').addEventListener('submit', async event => {
+    event.preventDefault();
+    const row = activeThread, body = $('reply-text').value.trim();
+    if (!row || !body) return;
+    replyRequest = replyRequest || crypto.randomUUID();  // Reused on retry, so a resubmit can never send twice.
+    $('reply-send').disabled = true; $('reply-note').classList.remove('error'); $('reply-note').textContent = 'Sending…';
+    try {
+      const result = await RudoApi.request(`/api/conversations/${row.id}/replies`, { method: 'POST', body: JSON.stringify({ body, requestId: replyRequest }) });
+      if (row !== activeThread) return;
+      if (result.status === 'sent') { $('reply-text').value = ''; replyRequest = null; await openThread(row); $('reply-note').textContent = 'Sent.'; }
+      else if (result.status === 'failed') { replyRequest = null; await openThread(row); $('reply-note').textContent = 'WhatsApp rejected the message. Nothing was sent.'; $('reply-note').classList.add('error'); }
+      else { await openThread(row); $('reply-note').textContent = 'Delivery is uncertain. Check WhatsApp before sending again.'; $('reply-note').classList.add('error'); }
+    } catch (error) {
+      if (row === activeThread) { $('reply-note').textContent = error.message; $('reply-note').classList.add('error'); $('reply-send').disabled = false; }
+    }
+  });
   $('filters').addEventListener('submit', event => { event.preventDefault(); loadPage(); });
   $('refresh').addEventListener('click', () => loadPage()); $('more').addEventListener('click', () => loadPage(true));
   $('older').addEventListener('click', () => activeThread && openThread(activeThread, true));

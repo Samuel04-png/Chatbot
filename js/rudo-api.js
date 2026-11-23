@@ -17,7 +17,10 @@
     cannot_change_self: 'Another admin must change your own access.', last_admin: 'At least one active admin must remain.',
     staff_exists: 'A staff member with this email already exists.', identity_already_linked: 'That login is already linked to staff.',
     provider_already_linked: 'This staff member already has a login from that provider.', sign_in_required: 'The person must sign in once before approval.',
-    invalid_email: 'Enter a valid email address.', invalid_role: 'Choose a valid role.', not_found: 'That record no longer exists.'
+    invalid_email: 'Enter a valid email address.', replies_disabled: 'Staff replies are switched off on this server.',
+    outside_24h_window: 'The patient last wrote more than 24 hours ago; WhatsApp only allows replies within 24 hours.',
+    agent_session_active: 'A WhatsApp agent is handling this patient right now.', reply_in_progress: 'Another reply to this patient is still being sent.',
+    invalid_message: 'Write a message (up to 3,800 characters).', invalid_role: 'Choose a valid role.', not_found: 'That record no longer exists.'
   };
   async function request(path, options = {}) {
     if (!path.startsWith('/api/')) throw new Error('Unsupported API path.');

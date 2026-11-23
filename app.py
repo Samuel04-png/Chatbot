@@ -39,7 +39,7 @@ def create_app(config=None, database=None, verifier=None, observer=None):
         OBSERVER_SOURCE_ID=os.getenv('RUDO_OBSERVER_SOURCE_ID',''),
         OBSERVER_SYNTHETIC_DEMO=False,
         FIREBASE_PROJECT_ID=os.getenv('FIREBASE_PROJECT_ID',''),
-        # Staff identity: Firebase stays the default until Supabase Auth passes staging verification.
+        # Staff identity: production runs Supabase Auth (set in .env and the launcher); firebase is the code default only for offline tests.
         IDENTITY_PROVIDERS=os.getenv('RUDO_IDENTITY_PROVIDERS','firebase'),
         BROWSER_AUTH=os.getenv('RUDO_BROWSER_AUTH','firebase'),
         SUPABASE_URL=os.getenv('SUPABASE_URL',''),
@@ -52,6 +52,11 @@ def create_app(config=None, database=None, verifier=None, observer=None):
         STAFF_ADMIN_DATABASE_URL=os.getenv('RUDO_STAFF_ADMIN_DATABASE_URL',''),
         CURSOR_SECRET=os.getenv('RUDO_CURSOR_SECRET',''),
         TRUST_PROXY=os.getenv('RUDO_TRUST_PROXY','false') == 'true',
+        # Staff replies (sent from the bot's WhatsApp number). Off unless explicitly enabled AND configured.
+        ENABLE_STAFF_REPLIES=os.getenv('RUDO_ENABLE_STAFF_REPLIES','false') == 'true',
+        SENDER_DATABASE_URL=os.getenv('RUDO_SENDER_DATABASE_URL',''),
+        WHATSAPP_TOKEN=os.getenv('WHATSAPP_TOKEN',''),
+        WHATSAPP_API_VERSION=os.getenv('WHATSAPP_API_VERSION','v19.0'),
         DATABASE_URL=os.getenv('RUDO_DATABASE_URL',''),
         WORKER_DATABASE_URL=os.getenv('RUDO_WORKER_DATABASE_URL',''),
         ENABLE_REMOTE_WRITES=os.getenv('RUDO_ENABLE_REMOTE_WRITES','false') == 'true',
@@ -73,6 +78,12 @@ def create_app(config=None, database=None, verifier=None, observer=None):
     auth_config = browser_auth_config(app.config)  # Fails startup if a privileged key would reach browsers.
     app.extensions['browser_auth'] = auth_config
     supabase_origin = ' ' + auth_config['supabase']['url'] if 'supabase' in auth_config else ''
+    if auth_config['provider'] == 'supabase':  # No Firebase/Google hosts once login runs on Supabase Auth.
+        scripts, connect, frames = " https://cdn.jsdelivr.net", "", ""
+    else:
+        scripts = " https://www.gstatic.com https://apis.google.com https://cdn.jsdelivr.net"
+        connect = " https://*.googleapis.com https://*.firebaseapp.com https://securetoken.googleapis.com"
+        frames = "frame-src https://*.firebaseapp.com https://accounts.google.com; "
     app.extensions['rudo_db'] = db
     rate_lock = threading.Lock()
     rates = defaultdict(deque)
@@ -134,10 +145,10 @@ def create_app(config=None, database=None, verifier=None, observer=None):
                         request.method, rule, response.status_code, elapsed, g.get('request_id', ''))
         # Inline scripts are retained for compatibility; no unsafe-eval or arbitrary connections.
         response.headers['Content-Security-Policy'] = (
-            "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://cdn.jsdelivr.net; "
+            "default-src 'self'; script-src 'self' 'unsafe-inline'" + scripts + "; "
             "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com data:; "
-            "img-src 'self' data: https://*.googleusercontent.com; connect-src 'self' https://*.googleapis.com https://*.firebaseapp.com https://securetoken.googleapis.com" + supabase_origin + "; "
-            "frame-src https://*.firebaseapp.com https://accounts.google.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'")
+            "img-src 'self' data: https://*.googleusercontent.com; connect-src 'self'" + connect + supabase_origin + "; "
+            + frames + "object-src 'none'; base-uri 'self'; frame-ancestors 'none'")
         return response
 
     @app.errorhandler(ApiError)

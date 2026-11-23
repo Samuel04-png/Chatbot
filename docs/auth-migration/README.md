@@ -1,5 +1,7 @@
 # Staff authentication: Firebase Auth → Supabase Auth (foundation)
 
+> **Superseded (2026-11-23):** the staff-only import (`migrate_staff_auth.py`, `staff_inventory.py`) is removed. Every Firebase account is now migrated with no access granted by import; see [FULL_MIGRATION.md](FULL_MIGRATION.md). The verification notes below still apply.
+
 Release 2 of the [production plan](../release/RELEASE_1.md). Status as of 2026-11-21: **implemented and verified locally with synthetic accounts and a real local Supabase Auth server.** No real Firebase users were exported. No Supabase project was changed, nothing was deployed, and no remote schema was touched. Firebase stays the default sign-in path (`RUDO_IDENTITY_PROVIDERS=firebase`, `RUDO_BROWSER_AUTH=firebase`).
 
 Scope is **staff accounts only**. Patients don't have dashboard accounts. The bot's six public tables, inference, webhook, sending and writes are untouched: `snapshot()` hashes are unchanged across the import tests.

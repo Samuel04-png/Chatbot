@@ -43,7 +43,15 @@ To switch identity, open the browser console and run `syntheticSwitchIdentity('<
 | States | Loading, empty, "pending approval", "not permitted", "source unavailable" and audit-failure states are all distinct. A failure never looks like an empty result. |
 | Safety | No sending, editing or webhook in the dashboard. The bot stays the only writer and sender, and its tables are unchanged. |
 
-## Signing in (production, Release 1: Firebase)
+## Signing in (production, since 2026-11-22: Supabase Auth)
+
+Staff login moved from Firebase to Supabase Auth (Mode C, Supabase only). Production had 0 staff and 0 sign-ins, so no Firebase accounts were imported.
+- Sign in or request access at `staff-login.html`; reset passwords at `staff-reset.html`. Old `login.html`, `register.html`, `forgot-password.html` and `reset-password.html` links redirect there.
+- A new person: **Request staff access** → confirm the email → an admin approves them in **Staff** (or the owner runs `scripts/staff_admin.py`).
+- Firebase is now off in the launcher (`RUDO_IDENTITY_PROVIDERS=supabase`, `RUDO_BROWSER_AUTH=supabase`). Setting both back to `firebase` is the rollback; no data change is needed.
+- Still needed in the Supabase dashboard (Authentication → URL Configuration): Site URL and redirect URLs for the dashboard host, plus custom SMTP before more than a couple of staff sign up (the built-in sender is heavily rate-limited).
+
+## Previous sign-in (Release 1: Firebase, retired)
 
 1. Tari, the first admin, signs in at `https://<dashboard>/login.html` with the existing Firebase email/password or Google login.
 2. To add staff, Tari opens **Staff**, creates an invitation (email, role, facilities), and tells the person to sign in.
@@ -82,7 +90,7 @@ Switching is done with two environment variables plus a restart. No rebuild is n
 
 - **Release 2 (staff login migration):**
   - Admins link a Supabase login to each person: Staff → "Invite Supabase login", the person signs in on `staff-login.html`, then the admin approves.
-  - Alternatively, existing Firebase passwords can be imported with `scripts/migrate_staff_auth.py`. This is verified against Supabase Auth v2.192.0; see [auth-migration](auth-migration/README.md).
+  - Alternatively, every Firebase account (with its password) is migrated by `scripts/migrate_firebase_auth.py`, rehearsed on Supabase Auth v2.198.0; see [FULL_MIGRATION](auth-migration/FULL_MIGRATION.md).
   - Firebase is never matched to Supabase by email alone.
 - **Release 3 (cleanup):** remove Firebase only after every active staff member has signed in with Supabase and recovery has been tested.
 

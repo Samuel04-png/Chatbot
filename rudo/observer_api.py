@@ -1,5 +1,6 @@
 """Observer-only HTTP surface. No mutation, webhook ingestion, state merge or transport."""
 import json
+import re
 from datetime import datetime
 from functools import wraps
 from pathlib import Path
@@ -7,6 +8,7 @@ from pathlib import Path
 from flask import Blueprint,Response,abort,g,jsonify,redirect,request,send_from_directory
 from .errors import ApiError
 from .observer import AccessAudit,Observer,StaffAdmin
+from .replies import StaffReplies
 
 
 FIREBASE_APP='<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>'
@@ -25,7 +27,9 @@ def register_observer(app, verifier, adapter=None):
         raise ValueError('RUDO_CURSOR_SECRET (32+ characters) is required with RUDO_OBSERVER_ALLOW_REMOTE')
     audit=AccessAudit(app.config['OBSERVER_AUDIT_DATABASE_URL'],allow_remote=remote)
     observer=adapter or Observer(app.config['OBSERVER_DATABASE_URL'],audit,app.config['OBSERVER_SOURCE_ID'],
-                                 cursor_secret=secret.encode() or None,allow_remote=remote)
+                                 cursor_secret=secret.encode() or None,allow_remote=remote,
+                                 replies=app.config.get('ENABLE_STAFF_REPLIES',False))
+    replies=app.config.get('STAFF_REPLIES') or StaffReplies.from_config(app.config,getattr(observer,'source_id',''))
     staff_admin=app.config.get('STAFF_ADMIN') or StaffAdmin(app.config.get('STAFF_ADMIN_DATABASE_URL',''),
                                                            getattr(observer,'audit',audit),getattr(observer,'source_id',''),allow_remote=remote)
     app.extensions['observer']=observer
@@ -37,7 +41,8 @@ def register_observer(app, verifier, adapter=None):
         if request.path.startswith('/api/') and request.method not in ('GET','HEAD','OPTIONS'):
             # Only staff administration may write, and only to observer_control through admin-checked
             # database functions. Patient/bot data has no write path at all.
-            if not (request.path.startswith('/api/admin/') and request.method=='POST'):
+            reply=re.fullmatch(r'/api/conversations/[A-Za-z0-9_-]{1,1024}/replies',request.path)
+            if not ((request.path.startswith('/api/admin/') or reply) and request.method=='POST'):
                 raise ApiError(405,'observer_read_only')
             if not request.is_json:raise ApiError(415,'json_required')
 
@@ -79,7 +84,22 @@ def register_observer(app, verifier, adapter=None):
 
     @api.get('/api/me')
     @authenticated
-    def me():return jsonify(observer.membership(g.identity))
+    def me():
+        member=observer.membership(g.identity)
+        member['canReply']=replies.available and member.get('role') in ('admin','operator')
+        member['readOnly']=not member['canReply']
+        return jsonify(member)
+
+    @api.post('/api/conversations/<conversation_id>/replies')
+    @authenticated
+    def reply(conversation_id):
+        data=body()
+        message=data.get('body')
+        if not isinstance(message,str) or not message.strip() or len(message)>3800:raise ApiError(400,'invalid_message')
+        request_id=data.get('requestId')
+        if not isinstance(request_id,str) or not re.fullmatch(r'[0-9a-fA-F-]{36}',request_id):raise ApiError(400,'invalid_request_id')
+        result=replies.send(g.identity,conversation_id,message.strip(),request_id)
+        return jsonify(result),201 if result['status']=='sent' and not result.get('duplicate') else 200
 
     @api.get('/api/conversations')
     @authenticated
@@ -207,6 +227,10 @@ def register_observer(app, verifier, adapter=None):
         if page in ('staff-login','staff-reset'):
             return send_from_directory(root,page+'.html')
         if page in ('login','forgot-password','reset-password','register'):
+            if app.extensions['browser_auth']['provider']=='supabase' and not app.config.get('OBSERVER_SYNTHETIC_DEMO'):
+                # Supabase Auth replaces the old Firebase pages; keep old links working.
+                return redirect({'login':'staff-login.html','register':'staff-login.html#request',
+                                 'forgot-password':'staff-reset.html','reset-password':'staff-reset.html'}[page])
             if app.config.get('OBSERVER_SYNTHETIC_DEMO'):
                 return Response('<!doctype html><title>Synthetic Rudo demo</title><h1>Signed out of the synthetic demo</h1><p>No external identity provider is connected.</p><a href="observer.html">Return to synthetic observer</a>',mimetype='text/html')
             return send_from_directory(root,page+'.html')

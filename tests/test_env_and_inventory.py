@@ -2,7 +2,7 @@
 import json
 import os
 
-from scripts import check_env, staff_inventory
+from scripts import check_env
 
 SIGNER = 'Q' * 86 + '=='
 
@@ -43,20 +43,6 @@ def test_checker_flags_compromised_key_secret_in_browser_slot_and_unsafe_switche
     assert s['RUDO_ENABLE_MESSAGE_DELIVERY'] == 'warning'
     (tmp_path / '.env').write_text('RUDO_ENABLE_REMOTE_WRITES=true\n')
     assert check_env.main([str(tmp_path / '.env')]) == 1
-
-
-def test_firebase_only_worksheet_has_no_hash_material(tmp_path, monkeypatch, capsys):
-    monkeypatch.chdir(tmp_path)
-    users = [{'uid': 'b', 'email': 'b@example.test', 'email_verified': True, 'providers': ['google.com']},
-             {'uid': 'a', 'email': 'a@example.test', 'email_verified': True, 'disabled': True,
-              'password_hash': 'aGFzaA==', 'password_salt': 'c2FsdA=='}]
-    report = staff_inventory.main(['--firebase-only'], env={'FIREBASE_PROJECT_ID': 'p', 'GOOGLE_APPLICATION_CREDENTIALS': 'x'},
-                                  firebase_users=users)
-    assert report['by_provider'] == {'google.com': 1, 'password': 1} and report['disabled'] == 1
-    assert [a['uid'] for a in report['accounts']] == ['a', 'b'] and report['accounts'][0]['role'] is None
-    written = (tmp_path / '.local/firebase-accounts-worksheet.json')
-    assert 'aGFzaA' not in written.read_text() and 'c2FsdA' not in written.read_text()
-    assert oct(written.stat().st_mode)[-3:] == '600'
 
 
 def test_release_credentials_send_only_scram_verifiers(tmp_path):

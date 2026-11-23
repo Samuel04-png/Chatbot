@@ -2,6 +2,7 @@
   "bot_tables_from": "synthetic fixture",
   "bot_service_role_round_trip_before": true,
   "migration_applied_as_postgres": true,
+  "replies_migration_applied_as_postgres": true,
   "bot_service_role_round_trip_after": true,
   "bot_tables_diff": {
     "table_acl_unchanged": true,
@@ -43,12 +44,14 @@
     "column_grants_removed": []
   },
   "only_change_on_bot_tables_is_rudo_observer": true,
+  "policies_unchanged_by_replies_migration": true,
   "anon_has_no_observer_control_access": true,
   "authenticated_has_no_observer_control_access": true,
   "service_role_has_no_observer_control_access": true,
   "rudo_observer_least_privilege": true,
   "rudo_observer_audit_least_privilege": true,
   "rudo_staff_admin_least_privilege": true,
+  "rudo_sender_least_privilege": true,
   "ready_endpoint": {
     "status": "ready"
   },

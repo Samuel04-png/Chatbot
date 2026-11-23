@@ -157,6 +157,13 @@ def test_auth_config_endpoint_and_pages_in_supabase_mode():
     for name in ('staff-login', 'staff-reset'):
         assert client.get(f'/{name}.html').status_code == 200
     assert client.get('/js/rudo-supabase-auth.js').status_code == 200
+    csp = page.headers['Content-Security-Policy']
+    assert 'firebase' not in csp and 'gstatic' not in csp and 'googleapis' not in csp
+    # Old Firebase login links lead to the Supabase pages.
+    for old, target in (('login', 'staff-login.html'), ('register', 'staff-login.html#request'),
+                        ('forgot-password', 'staff-reset.html'), ('reset-password', 'staff-reset.html')):
+        response = client.get(f'/{old}.html')
+        assert response.status_code == 302 and response.headers['Location'].endswith(target)
 
 
 def test_firebase_remains_default_browser_path():
@@ -195,42 +202,6 @@ def test_output_guard_blocks_secret_material():
     assert_no_secrets({'uid': 'x', 'result': 'would_create'})
     for bad in ({'h': '$fbscrypt$v=1'}, {'k': 'sb_secret_x'}, {'password_hash': 'x'}, {'p': '-----BEGIN ' + 'PRIVATE KEY-----'}):
         with pytest.raises(RuntimeError):assert_no_secrets(bad)
-
-
-class AdminHttp:
-    def __init__(self, responses):self.responses,self.calls=list(responses),[]
-    def request(self, method, url, **kw):
-        self.calls.append((method, url, kw));return self.responses.pop(0)
-
-
-def test_supabase_admin_client_paginates_and_reports_errors_without_bodies():
-    from rudo.staff_migration import SupabaseAdmin
-    with pytest.raises(ValueError):SupabaseAdmin(URL, '')
-    http = AdminHttp([Response(200, {'users': [{'id': str(i)} for i in range(200)]}), Response(200, {'users': [{'id': 'last'}]})])
-    admin = SupabaseAdmin(URL, 'service-key-synthetic', http=http)
-    assert len(list(admin.users())) == 201 and [c[2]['params']['page'] for c in http.calls] == [1, 2]
-    assert http.calls[0][2]['headers']['Authorization'] == 'Bearer service-key-synthetic' and http.calls[0][1] == ISS + '/admin/users'
-    with pytest.raises(RuntimeError, match='HTTP 500'):list(SupabaseAdmin(URL, 'k', http=AdminHttp([Response(500, None)])).users())
-    assert SupabaseAdmin(URL, 'k', http=AdminHttp([Response(201, {'id': 'u'})])).create({}) == {'id': 'u'}
-    with pytest.raises(RuntimeError, match='email_exists') as exc:
-        SupabaseAdmin(URL, 'k', http=AdminHttp([Response(422, {'error_code': 'email_exists', 'msg': 'a@b'})])).create({})
-    assert 'a@b' not in str(exc.value)
-
-
-def test_inventory_holds_unverified_oauth_and_unsupported_providers():
-    from rudo.staff_migration import classify, normalise_firebase_user
-    rows = [{'issuer': 'https://securetoken.google.com/p', 'subject': s, 'staff_id': s, 'role': 'operator', 'status': 'active', 'email': None}
-            for s in ('g', 'f', 'n', 'o')]
-    users = [{'uid': 'g', 'email': 'g@example.test', 'email_verified': False, 'providers': ['google.com']},
-             {'uid': 'f', 'email': 'f@example.test', 'email_verified': True, 'providers': ['facebook.com']},
-             {'uid': 'n', 'email': None, 'email_verified': False, 'providers': ['phone']},
-             type('Exported', (), {'uid': 'o', 'email': 'o@example.test', 'email_verified': True, 'disabled': False, 'display_name': None,
-                                   'provider_data': [type('P', (), {'provider_id': 'google.com'})()], 'password_hash': None, 'password_salt': None})()]
-    report = classify(users, rows, 'p')
-    assert {h['uid']: h['reasons'] for h in report['held']} == {
-        'g': ['unverified_email'], 'f': ['unsupported_provider:facebook.com'], 'n': ['no_email', 'unsupported_provider:phone']}
-    assert [c['uid'] for c in report['candidates']] == ['o']
-    assert normalise_firebase_user({'uid': 'x', 'password_hash': 'aA==', 'providers': []})['providers'] == ['password']
 
 
 # Firebase ID tokens verified without Admin SDK credentials (RUDO_FIREBASE_CHECK_REVOKED=false).

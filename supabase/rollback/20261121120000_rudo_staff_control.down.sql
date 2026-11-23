@@ -21,10 +21,11 @@ DROP SCHEMA IF EXISTS observer_control CASCADE;
 DROP ROLE IF EXISTS rudo_observer;
 DROP ROLE IF EXISTS rudo_observer_audit;
 DROP ROLE IF EXISTS rudo_staff_admin;
+DROP ROLE IF EXISTS rudo_sender;  -- Created by 20261121150000 (staff replies), if applied.
 -- Post-condition checks: fail (and roll back) if anything remains.
 DO $$ BEGIN
  IF EXISTS(SELECT 1 FROM pg_policies WHERE schemaname='public' AND policyname='rudo_observer_read') THEN RAISE EXCEPTION 'policy remains'; END IF;
- IF EXISTS(SELECT 1 FROM pg_roles WHERE rolname IN ('rudo_observer','rudo_observer_audit','rudo_staff_admin')) THEN RAISE EXCEPTION 'role remains'; END IF;
+ IF EXISTS(SELECT 1 FROM pg_roles WHERE rolname IN ('rudo_observer','rudo_observer_audit','rudo_staff_admin','rudo_sender')) THEN RAISE EXCEPTION 'role remains'; END IF;
  IF EXISTS(SELECT 1 FROM pg_namespace WHERE nspname='observer_control') THEN RAISE EXCEPTION 'schema remains'; END IF;
 END $$;
 COMMIT;
