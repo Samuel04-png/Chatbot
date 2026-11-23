@@ -218,3 +218,54 @@ def test_cli_guards_dry_run_by_default_and_never_prints_secrets(tmp_path, monkey
         assert secret not in printed
     worksheet = (tmp_path / 'out').glob('plan-*.json')
     assert all(HASH not in p.read_text() and oct(p.stat().st_mode)[-3:] == '600' for p in worksheet)
+
+
+# ---------- Firestore data landing ----------
+from rudo import firestore_migration as fsm  # noqa: E402
+import datetime as _dt  # noqa: E402
+
+
+class _Ref:
+    def __init__(self, path):self.path, self.id = path, path.rsplit('/', 1)[-1]
+
+
+class _Geo:
+    latitude, longitude = -15.4, 28.3
+
+
+def test_firestore_values_keep_their_types_and_hash_stably():
+    when = _dt.datetime(2025, 1, 2, 3, 4, 5, tzinfo=_dt.timezone.utc)
+    data = fsm.encode({'t': when, 'r': _Ref('mother/m1'), 'g': _Geo(), 'b': b'\x00\x01', 'n': [1, 2.5, None, {'x': True}]})
+    assert data == {'t': {'__type': 'timestamp', 'value': '2025-01-02T03:04:05+00:00'}, 'r': {'__type': 'reference', 'path': 'mother/m1'},
+                    'g': {'__type': 'geopoint', 'latitude': -15.4, 'longitude': 28.3}, 'b': {'__type': 'bytes', 'base64': 'AAE='},
+                    'n': [1, 2.5, None, {'x': True}]}
+    assert fsm.content_sha256({'a': 1, 'b': 2}) == fsm.content_sha256({'b': 2, 'a': 1})
+
+
+def test_every_collection_has_an_owner_and_subcollections_inherit():
+    assert fsm.owner_for('mobile_chats/c1/messages/m9') == 'dawamom' and fsm.owner_for('encounter/e1') == 'dawaclinician'
+    assert fsm.owner_for('whatsapp_chats/w/messages/x') == 'rudo_or_unknown' and fsm.owner_for('new_collection/x') == 'unknown'
+    assert fsm.account_owner('Mother') == 'dawamom' and fsm.account_owner('Doctor') == 'dawaclinician' and fsm.account_owner(None) == 'rudo_or_unknown'
+
+
+class _DocLedger:
+    def __init__(self):self.docs = {}
+    def upsert_documents(self, rows):
+        for row in rows:self.docs[row[1]] = row[10]
+        return len(rows)
+    def document_hashes(self, project):return dict(self.docs)
+
+
+def test_document_import_is_idempotent_and_reconciled_by_path_and_hash():
+    docs = [{'path': f'parity/p{i}', 'collection_id': 'parity', 'collection_path': 'parity', 'doc_id': f'p{i}', 'parent_path': None,
+             'data': {'i': i}, 'create_time': None, 'update_time': None, 'content_sha256': fsm.content_sha256({'i': i})} for i in range(1200)]
+    docs.append({'path': 'mobile_chats/c/messages/m', 'collection_id': 'messages', 'collection_path': 'mobile_chats/c/messages', 'doc_id': 'm',
+                 'parent_path': 'mobile_chats/c', 'data': {}, 'create_time': None, 'update_time': None, 'content_sha256': fsm.content_sha256({})})
+    summary = fsm.summarise(docs)
+    assert summary['by_collection'] == {'mobile_chats/*/messages': 1, 'parity': 1200} and summary['by_owner_app'] == {'dawaclinician': 1200, 'dawamom': 1}
+    ledger = _DocLedger()
+    assert fsm.import_documents(docs, 'p', ledger, 'run') == 1201 and fsm.import_documents(docs, 'p', ledger, 'run') == 1201
+    assert fsm.reconcile_documents(docs, 'p', ledger)['coverage_complete'] is True
+    del ledger.docs['parity/p7']; ledger.docs['parity/p8'] = '0' * 64
+    bad = fsm.reconcile_documents(docs, 'p', ledger)
+    assert (bad['missing'], bad['content_mismatch'], bad['coverage_complete']) == (1, 1, False)

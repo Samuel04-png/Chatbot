@@ -1,5 +1,13 @@
 # Rudo local observer
 
+## Test Rudo on a Mac (demo mode, no passwords needed)
+
+Follow **[docs/TARI_LOCAL_TESTING.md](docs/TARI_LOCAL_TESTING.md)**. After installing the tools, one command starts a synthetic demo with made-up data and no connection to production, Supabase, Firebase or WhatsApp:
+
+```sh
+scripts/demo_mac.sh        # then open http://127.0.0.1:5051/observer.html   (stop: Control+C)
+```
+
 Option C is implemented locally: a read-only Flask/Firebase dashboard over a synthetic version of the inspected six-table bot database, with explicit staff/account/facility scope and a separate append-only audit connection. **Production integration remains on HOLD.** No remote migrations, real patient imports, provider sends or deployment were performed.
 
 Start with the [implementation and file map](docs/observer-implementation/README.md), [actual test results](docs/observer-implementation/TEST_RESULTS.md), [local runbook](docs/observer-implementation/RUNBOOK.md) and [proposed rollout/rollback](docs/observer-implementation/ROLLOUT.md).

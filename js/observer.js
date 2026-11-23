@@ -142,7 +142,10 @@
       $('identity').textContent = `${member.displayName || member.email || member.subject} · ${member.role} · ${member.scopes.length} approved facilit${member.scopes.length === 1 ? 'y' : 'ies'}`;
       $('staff-link').hidden = member.role !== 'admin';
       $('mode-badge').textContent = member.canReply ? 'Staff replies on' : 'Read-only observer';
-      $('mode-note').textContent = member.canReply ? 'Replies are sent from the Rudo WhatsApp number and saved to the conversation. The bot keeps answering automatically.' : 'The existing bot remains the source owner. Sending, resolving and record editing are disabled.';
+      const demo = document.body.dataset.environment === 'synthetic-local';
+      $('mode-note').textContent = !member.canReply ? 'The existing bot remains the source owner. Sending, resolving and record editing are disabled.'
+        : demo ? 'Demo: replies are saved to the synthetic conversation only. Nothing is sent to WhatsApp.'
+        : 'Replies are sent from the Rudo WhatsApp number and saved to the conversation. The bot keeps answering automatically.';
       populateScopes(member.scopes); selectView();
     } catch (error) { if (epoch === identityEpoch) { member = null; state('page-state', error.message, true); $('identity').textContent = 'Staff access unavailable'; } }
   }

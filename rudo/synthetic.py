@@ -149,3 +149,24 @@ def admin_dsn(dsn=LOCAL_DSN):
 
 def sender_dsn(dsn=LOCAL_DSN):
     return make_conninfo(dsn,user='rudo_sender')
+
+
+class SyntheticSender:
+    """Demo stand-in for the WhatsApp sender: no network, no token. Every send is recorded locally as
+    'sent' with a synthetic provider id, so the reply flow can be tried end to end without messaging anyone."""
+    enabled, token, account = True, 'synthetic-no-network', 'synthetic-no-network'
+
+    def __init__(self):
+        self.sent = []
+
+    def send(self, phone, body):
+        self.sent.append(phone)
+        return 'sent', f'wamid.SYNTHETIC-{len(self.sent)}'
+
+
+def open_reply_window(dsn=LOCAL_DSN):
+    """Demo only: a fresh synthetic patient message so the 24-hour WhatsApp reply window is open for Facility A."""
+    assert_disposable(dsn)
+    with psycopg.connect(dsn) as conn:
+        conn.execute("INSERT INTO public.messages(phone,role,message,message_en) VALUES(%s,'user','Synthetic question: can I visit the clinic today?','x')",
+                     (PHONES['a'],))

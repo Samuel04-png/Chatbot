@@ -7,15 +7,42 @@
 
 ## Status (2026-11-23)
 
+**Owner decision (2026-11-23).** Everything goes into Rudo's Supabase project, kept separate inside it:
+- Accounts are tagged with `owner_app` and get no dashboard access.
+- Firestore data goes into the private `firebase_import` schema, never into Rudo's `public` tables.
+- dawaMom and dawaClinician already run on Supabase, so these copies are historical records.
+
+**Firebase project `dawa-ca263` is shared by:**
+- Rudo (web)
+- dawaMom (web, Android, iOS)
+- dawaClinician (Android, iOS)
+- "Analytics" (`com.websolid.csdemo`, Android and iOS)
+
+**Accounts: 87.** All are staged for import, and none need manual review.
+- **By app:** 74 dawaMom, 2 dawaClinician, 11 Rudo or unknown.
+- **Sign-in:** 80 password accounts, all with exportable hashes, so every password is kept. 8 Google accounts, 7 of them Google-only.
+- **Verified email:** 11. The other 76 must confirm their email in Supabase.
+- **None** disabled, phone, anonymous, MFA, tenant or duplicate.
+
+**Firestore: 5,348 documents.**
+- **By app:**
+  - 4,411 dawaClinician: `parity` 4,339, `encounter` 40, `doctor` 21, `first_encounter` 10, `clinic` 1.
+  - 675 dawaMom: `mobile_chats` 11 plus 590 messages, `mother` 24, `weeks_of_pregenancy` 40, and 10 records under `users/*` (period-tracker settings, daily notes).
+  - 80 shared profiles (`user`).
+  - 182 Rudo or unknown: `whatsapp_chats` 18 plus 162 messages, `chatbot_users` 1, `analytics` 1.
+- **Realtime Database:** none (404). **Storage:** 2 buckets, 0 objects. **Cloud Functions:** none. **Hosting:** `dawa-ca263.web.app`.
+
+**Exports** (encrypted, in `~/.rudo-migration/`):
+- Accounts: sha256 `654ffeb5…`
+- Firestore: sha256 `cc646b11…`
+
 | Step | State |
 |---|---|
-| Firebase access | **Waiting on owner.** Use your own Google login (below). The exposed key `43a1573c…` is refused by the scripts. |
-| Firebase inventory (Auth, Firestore, Realtime Database, Storage, apps) | Script ready: `scripts/firebase_inventory.py`. Not run yet. |
-| Account migration engine | Done. Every account gets one outcome. Tests: `tests/test_firebase_migration.py`. |
-| Rehearsal on real Supabase Auth v2.198.0 | **40/40 checks pass** (`scripts/rehearse_firebase_migration_local.py`), and pass again on a re-run. |
-| Ledger schema migration `20261123063840_firebase_account_migration.sql` | Written and rehearsed. **Not applied to production.** |
-| Production backup and restore test | **Not done.** Needs `SUPABASE_DB_PASSWORD` and `RUDO_BACKUP_PASSPHRASE` (see `scripts/backup_production.sh`). |
-| Firestore, Realtime Database and Storage data mapping | Designed (below). Built once the inventory shows what exists. |
+| Firebase access (owner's Google login) | Done |
+| Inventory, encrypted exports, dry-run plans | Done; read-only |
+| Rehearsal on Supabase Auth v2.198.0 (accounts and Firestore landing) | **49/49 checks pass** |
+| Migrations `20261123063840_firebase_account_migration`, `20261123085525_firebase_data_landing` | Written and rehearsed. **Not applied.** |
+| Production backup and isolated restore test | **Not done.** Needs `SUPABASE_DB_PASSWORD` and `RUDO_BACKUP_PASSPHRASE`. |
 
 ## 1. Secure Firebase access (owner, one time)
 
@@ -84,7 +111,7 @@ gcloud auth application-default set-quota-project dawa-ca263
 ## 4. Run order (production steps need explicit owner approval)
 
 1. **Backup:** `scripts/backup_production.sh`, then `scripts/verify_backup_restore.sh` (isolated restore).
-2. **Apply the ledger migration** `20261123063840_firebase_account_migration.sql` as `postgres` in one transaction. Then set the `rudo_migrator` password (SCRAM verifier only) and put `RUDO_MIGRATOR_DATABASE_URL` in `.env`.
+2. **Apply** `20261123063840_firebase_account_migration.sql`, then `20261123085525_firebase_data_landing.sql`, as `postgres`, each in one transaction. Then set the `rudo_migrator` password (SCRAM verifier only) and put `RUDO_MIGRATOR_DATABASE_URL` in `.env`.
 3. **Export:** `.venv/bin/python scripts/migrate_firebase_auth.py export`. This writes an AES-256-GCM encrypted file to `~/.rudo-migration/`; the key is in `~/.config/rudo/migration.key`, mode 600.
 4. **Plan:** `migrate_firebase_auth.py plan --export <file>`. Dry run: prints the counts and writes the per-account worksheet.
 5. **Test account:**
@@ -92,8 +119,9 @@ gcloud auth application-default set-quota-project dawa-ca263
    - Run `migrate_firebase_auth.py import --export <file> --execute --confirm-project cktfbpnxpfbyroqzuibc --only-uid <test uid>`.
    - Sign in with that account's Firebase password, then run `reconcile`.
 6. **Everyone:** the same `import` command without `--only-uid`. It is idempotent and restartable; re-running it never duplicates anyone.
-7. **Reconcile:** `migrate_firebase_auth.py reconcile --export <file>` must show `coverage_complete: true` and 0 problems. Every `manual` row has a reason.
-8. **Keep Firebase running** until the owner signs off. Do not delete Firebase users or data.
+7. **Firestore:** `migrate_firebase_auth.py export-data`, then `plan-data`, then `import-data --execute --confirm-project cktfbpnxpfbyroqzuibc`, then `reconcile-data`. Each document is upserted by its original path; reconciliation compares every path and content hash.
+8. **Reconcile:** `migrate_firebase_auth.py reconcile --export <file>` must show `coverage_complete: true` and 0 problems. Every `manual` row has a reason.
+9. **Keep Firebase running** until the owner signs off. Do not delete Firebase users or data.
 
 ## 5. Firestore, Realtime Database and Storage (once the inventory shows data)
 

@@ -277,6 +277,10 @@ def report_counts(facts, decisions):
             'dashboard_access_granted_by_import': 0, 'remediation': dict(sorted(remediation.items()))}
 
 
+def owner_counts(records):
+    return dict(sorted(collections.Counter(r.get('owner_app') or 'untagged' for r in records).items()))
+
+
 def assert_no_secrets(value):
     text = json.dumps(value, default=str)
     for marker in ('$fbscrypt$', 'sb_secret_', '-----BEGIN', '"password_hash":', '"password_salt":'):
@@ -347,6 +351,33 @@ class Ledger:
                        decision['password'], status, decision['remediation'], source_sha256(record), run_id, error))
             c.execute('INSERT INTO firebase_migration.events(run_id,firebase_uid,event,detail) VALUES(%s,%s,%s,%s)',
                       (run_id, f['uid'], status if not error else 'failed', Jsonb({'action': decision['action'], **({'error': error} if error else {})})))
+
+    def _has_owner_column(self, conn):
+        if not hasattr(self, '_owner_col'):
+            self._owner_col = bool(conn.execute("SELECT 1 FROM information_schema.columns WHERE table_schema='firebase_migration' "
+                                                "AND table_name='accounts' AND column_name='owner_app'").fetchone())
+        return self._owner_col
+
+    def set_owner_app(self, project, uid, owner_app):
+        with self._conn() as c:
+            if not self._has_owner_column(c):
+                raise RuntimeError('Apply 20261123085525_firebase_data_landing before importing (owner_app column missing)')
+            c.execute('UPDATE firebase_migration.accounts SET owner_app=%s WHERE firebase_project=%s AND firebase_uid=%s', (owner_app, project, uid))
+
+    def upsert_documents(self, rows):
+        with self._conn() as c, c.cursor() as cur, c.transaction():
+            cur.executemany('''INSERT INTO firebase_import.documents AS d(firebase_project,path,collection_id,collection_path,doc_id,parent_path,owner_app,
+                               data,firebase_create_time,firebase_update_time,content_sha256,last_run)
+                               VALUES(%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s,%s,%s,%s)
+                               ON CONFLICT(firebase_project,database_id,path) DO UPDATE SET data=EXCLUDED.data,owner_app=EXCLUDED.owner_app,
+                                 firebase_create_time=EXCLUDED.firebase_create_time,firebase_update_time=EXCLUDED.firebase_update_time,
+                                 content_sha256=EXCLUDED.content_sha256,last_run=EXCLUDED.last_run,imported_at=now()
+                               WHERE d.content_sha256 IS DISTINCT FROM EXCLUDED.content_sha256 OR d.owner_app IS DISTINCT FROM EXCLUDED.owner_app''', rows)
+            return len(rows)
+
+    def document_hashes(self, project):
+        with self._conn() as c:
+            return dict(c.execute('SELECT path,content_sha256 FROM firebase_import.documents WHERE firebase_project=%s', (project,)).fetchall())
 
     def copy_staff_link(self, project, uid, issuer, actor):
         with self._conn() as c:
@@ -427,6 +458,8 @@ def execute_plan(records, project, export_sha, admin, ledger, supabase_url, para
         record = by_uid[d['uid']]
         if d['action'] in ('manual', 'excluded_by_owner'):
             ledger.record(run_id, project, record, d, d['action'])
+            if record.get('owner_app'):
+                ledger.set_owner_app(project, d['uid'], record['owner_app'])
             outcome[d['action']] += 1
             continue
         processed += 1
@@ -443,9 +476,13 @@ def execute_plan(records, project, export_sha, admin, ledger, supabase_url, para
                     user_id, error = again['id'], None
         if not user_id:
             ledger.record(run_id, project, record, d, 'failed', error=error or 'create_failed')
+            if record.get('owner_app'):
+                ledger.set_owner_app(project, d['uid'], record['owner_app'])
             outcome['failed'] += 1
             continue
         ledger.record(run_id, project, record, d, 'imported', supabase_user_id=user_id)
+        if record.get('owner_app'):
+            ledger.set_owner_app(project, d['uid'], record['owner_app'])
         outcome['imported'] += 1
         if link_oauth:
             for identity in account_facts(record)['provider_identities']:

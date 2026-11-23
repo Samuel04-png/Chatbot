@@ -129,3 +129,12 @@ def test_sender_login_can_only_call_its_functions(setup):
         # Without a verified staff identity in the session, the functions refuse.
         with pytest.raises(psycopg.errors.InsufficientPrivilege):
             conn.execute("SELECT observer_control.begin_staff_reply(gen_random_uuid(),%s,'x')", (PHONES['a'],))
+
+
+def test_demo_sender_never_uses_the_network(monkeypatch):
+    from rudo.synthetic import SyntheticSender
+    import requests
+    monkeypatch.setattr(requests, 'request', lambda *a, **k: (_ for _ in ()).throw(AssertionError('network used')))
+    monkeypatch.setattr(requests, 'post', lambda *a, **k: (_ for _ in ()).throw(AssertionError('network used')))
+    sender = SyntheticSender()
+    assert sender.send('260000000101', 'hi') == ('sent', 'wamid.SYNTHETIC-1') and sender.sent == ['260000000101']

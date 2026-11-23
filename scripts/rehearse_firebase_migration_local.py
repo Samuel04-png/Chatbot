@@ -30,12 +30,14 @@ from psycopg.conninfo import make_conninfo
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from rudo import firebase_migration as fm  # noqa: E402
+from rudo import firestore_migration as fsm  # noqa: E402
 from rudo.staff_migration import HashParams, firebase_scrypt  # noqa: E402
 from scripts.release1_credentials import scram_verifier  # noqa: E402
 
 M = ROOT / 'supabase/migrations'
 R = ROOT / 'supabase/rollback'
 STAFF, REPLIES, FIREBASE = '20261121120000_rudo_staff_control', '20261121150000_rudo_staff_replies', '20261123063840_firebase_account_migration'
+DATA = '20261123085525_firebase_data_landing'
 TABLES = ('users', 'messages', 'referrals', 'orders', 'kv', 'user_state')
 PROJECT, SOURCE = 'rehearsal-firebase', 'rehearsal-source'
 FB_ISSUER = 'https://securetoken.google.com/' + PROJECT
@@ -51,6 +53,8 @@ def reset(db, admin):
         if conn.execute("SELECT 1 FROM pg_namespace WHERE nspname='firebase_migration'").fetchone():
             for (uid,) in conn.execute("SELECT supabase_user_id FROM firebase_migration.accounts WHERE supabase_user_id IS NOT NULL").fetchall():
                 admin.delete(str(uid))
+            if conn.execute("SELECT 1 FROM pg_namespace WHERE nspname='firebase_import'").fetchone():
+                conn.execute((R / f'{DATA}.down.sql').read_text())
             conn.execute((R / f'{FIREBASE}.down.sql').read_text())
         if conn.execute("SELECT to_regclass('observer_control.staff_replies')").fetchone()[0]:
             conn.execute((R / f'{REPLIES}.down.sql').read_text())
@@ -92,7 +96,7 @@ def main():
     reset(db, admin)
     with psycopg.connect(db, autocommit=True) as conn:
         before = bot_snapshot(conn)
-    for name in (STAFF, REPLIES, FIREBASE):
+    for name in (STAFF, REPLIES, FIREBASE, DATA):
         with psycopg.connect(db) as conn:  # One transaction each, as "postgres" - exactly as in production.
             conn.execute((M / f'{name}.sql').read_text())
     pw = {r: secrets.token_urlsafe(24) for r in ('rudo_migrator', 'rudo_observer')}
@@ -133,6 +137,8 @@ def main():
                 account('redacted', f'redacted-{sfx}@example.test', hashed=False),
                 account('claims', f'claims-{sfx}@example.test', customAttributes=json.dumps({'dawaMomRole': 'mother'})),
                 account('taken', f'taken-{sfx}@example.test')]
+    for a in accounts:
+        a['owner_app'] = {'pending': 'dawamom', 'claims': 'dawamom', 'disabled': 'dawaclinician'}.get(a['uid'], 'rudo_or_unknown')
     accounts[10]['providers'].append({'provider': 'password', 'provider_uid': 'redacted', 'email': accounts[10]['email']})
     squatter, _ = admin.create({'email': f'taken-{sfx}@example.test', 'password': secrets.token_urlsafe(16), 'email_confirm': True})
     export_sha = hashlib.sha256(json.dumps(accounts, sort_keys=True).encode()).hexdigest()
@@ -212,9 +218,46 @@ def main():
     for uid in ('pending', 'both', 'claims', 'disabled', 'phone'):
         check(f'imported_nonstaff_sees_no_patients:{uid}', visible_patients(fm.supabase_user_id(PROJECT, uid)) == 0)
     with psycopg.connect(db, autocommit=True) as conn:
+        owners = dict(conn.execute("SELECT owner_app,count(*) FROM firebase_migration.accounts GROUP BY 1").fetchall())
+        check('accounts_tagged_by_owner_app', owners == {'dawamom': 2, 'dawaclinician': 1, 'rudo_or_unknown': 10}, owners)
+
+    # Firestore landing: typed values, sub-collections, idempotent upsert, reconciliation, isolation.
+    import datetime as _dt
+    class Ref:
+        def __init__(self, path): self.path, self.id = path, path.rsplit('/', 1)[-1]
+    def doc(path, data):
+        enc = fsm.encode(data); parts = path.split('/')
+        return {'path': path, 'collection_id': parts[-2], 'collection_path': '/'.join(parts[:-1]), 'doc_id': parts[-1],
+                'parent_path': '/'.join(parts[:-2]) or None, 'data': enc, 'create_time': '2025-01-01T00:00:00+00:00',
+                'update_time': '2025-01-02T00:00:00+00:00', 'content_sha256': fsm.content_sha256(enc)}
+    when = _dt.datetime(2025, 3, 1, tzinfo=_dt.timezone.utc)
+    docs = [doc('mother/m1', {'name': 'Synthetic mother', 'dateOfBirth': when, 'user_Id': 'pending'}),
+            doc('encounter/e1', {'mother_id': Ref('mother/m1'), 'bp': '120/80', 'date': when}),
+            doc('mobile_chats/c1', {'user_id': 'pending'}), doc('mobile_chats/c1/messages/x1', {'text': "Synthetic 'quoted' \u00e9", 'at': when}),
+            doc('whatsapp_chats/w1/messages/y1', {'text': 'Synthetic'})] + [doc(f'parity/p{i}', {'complications': [], 'i': i}) for i in range(600)]
+    run = ledger.start(PROJECT, 'b' * 64, 'execute', 'rehearsal')
+    check('documents_imported', fsm.import_documents(docs, PROJECT, ledger, run) == 605)
+    fsm.import_documents(docs, PROJECT, ledger, run)
+    data_rec = fsm.reconcile_documents(docs, PROJECT, ledger)
+    check('documents_reconciled_by_path_and_hash', data_rec['coverage_complete'] and data_rec['landed_documents'] == 605,
+          {k: data_rec[k] for k in ('landed_documents', 'missing', 'content_mismatch')})
+    with psycopg.connect(db, autocommit=True) as conn:
+        row = conn.execute("SELECT owner_app,parent_path,data->'at'->>'__type',data->>'text' FROM firebase_import.documents WHERE path='mobile_chats/c1/messages/x1'").fetchone()
+        check('subcollection_kept_with_parent_owner_and_types', row == ('dawamom', 'mobile_chats/c1', 'timestamp', "Synthetic 'quoted' \u00e9"), row)
+        check('reference_preserved', conn.execute("SELECT data->'mother_id'->>'path' FROM firebase_import.documents WHERE path='encounter/e1'").fetchone()[0] == 'mother/m1')
+        for role in ('anon', 'authenticated', 'service_role', 'rudo_observer'):
+            try:
+                with conn.transaction():
+                    conn.execute(sql.SQL('SET LOCAL ROLE {}').format(sql.Identifier(role)))
+                    conn.execute('SELECT count(*) FROM firebase_import.documents')
+                check(f'{role}_cannot_read_firestore_copy', False)
+            except psycopg.errors.InsufficientPrivilege:
+                check(f'{role}_cannot_read_firestore_copy', True)
         check('bot_tables_unchanged', bot_snapshot(conn) == before)
 
     rb = fm.rollback_users(PROJECT, admin, ledger, execute=True)
+    with psycopg.connect(db) as conn:
+        conn.execute((R / f'{DATA}.down.sql').read_text())
     with psycopg.connect(db) as conn:
         conn.execute((R / f'{FIREBASE}.down.sql').read_text())
     with psycopg.connect(db, autocommit=True) as conn:
@@ -227,6 +270,8 @@ def main():
         check('bot_tables_unchanged_after_rollback', bot_snapshot(conn) == before)
     with psycopg.connect(db) as conn:  # Re-apply after rollback works.
         conn.execute((M / f'{FIREBASE}.sql').read_text())
+    with psycopg.connect(db) as conn:
+        conn.execute((M / f'{DATA}.sql').read_text())
     check('reapply_after_rollback', True)
     admin.delete(squatter['id'])
     out = {'passed': sum(1 for k, v in checks.items() if k != 'auth_version' and (v is True or (isinstance(v, dict) and v['ok']))),

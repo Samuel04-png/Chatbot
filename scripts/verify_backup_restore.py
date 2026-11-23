@@ -33,17 +33,72 @@ def psql(url, *args, check=True):
     return subprocess.run([str(PGBIN / 'psql'), url, '-X', '-q', *args], capture_output=True, text=True, check=check)
 
 
-def linked_query(sql_text):
+class CliQueryError(RuntimeError):
+    """A production read-only query did not return rows. The message never contains credentials or row data."""
+
+
+_SECRET = re.compile(r'(postgres(ql)?://\S+|password=\S+|sb_secret_\S+|eyJ[\w-]+\.[\w-]+\.[\w-]+)', re.I)
+TRANSIENT = ('429', '502', '503', '504', 'timeout', 'Timeout', 'ECONNRESET', 'temporarily')
+
+
+def _clean(text, limit=300):
+    return _SECRET.sub('<redacted>', ' '.join((text or '').split()))[:limit]
+
+
+def parse_cli_rows(returncode, stdout, stderr):
+    """Supabase CLI `db query --output-format json` (v2.109.1). Two success formats exist:
+      terminal  -> exit 0, stdout is a bare JSON array of row objects: [{"c": ...}]
+      AI agent  -> exit 0, stdout {"boundary": ..., "rows": [...], "warning": ...} (the CLI adds this
+                   untrusted-data envelope when it detects an agent environment, e.g. AI_AGENT/CLAUDECODE)
+      failure   -> exit 1, stdout {"_tag": "Error", "error": {"code": ..., "message": ...}}
+    Anything else (no JSON, error envelope with exit 0, a dict without a "rows" list) is reported, never guessed."""
+    text = stdout or ''
+    starts = [i for i in (text.find('['), text.find('{')) if i >= 0]
+    payload = None
+    if starts:
+        try:
+            payload = json.JSONDecoder().raw_decode(text[min(starts):])[0]
+        except ValueError:
+            payload = None
+    if isinstance(payload, dict) and (payload.get('_tag') == 'Error' or 'error' in payload):
+        err = payload.get('error') if isinstance(payload.get('error'), dict) else {'message': str(payload.get('error'))}
+        raise CliQueryError(f"Supabase CLI error {err.get('code', 'unknown')} (exit {returncode}): {_clean(err.get('message'))}")
+    if returncode != 0:
+        raise CliQueryError(f'Supabase CLI exited {returncode}: {_clean(stderr or stdout)}')
+    if isinstance(payload, list):
+        rows = payload
+    elif isinstance(payload, dict):
+        rows = payload.get('rows')
+        if not isinstance(rows, list):
+            raise CliQueryError(f'Supabase CLI JSON has no "rows" list (keys: {sorted(payload)[:10]})')
+    else:
+        raise CliQueryError(f'Supabase CLI returned no JSON (stderr: {_clean(stderr, 200)})')
+    if not all(isinstance(r, dict) for r in rows):
+        raise CliQueryError('Supabase CLI rows are not JSON objects')
+    return rows
+
+
+def linked_query(sql_text, attempts=3, runner=subprocess.run):
+    """Read-only (BEGIN READ ONLY ... ROLLBACK). Returns column "c" of the single result row."""
     with tempfile.NamedTemporaryFile('w', suffix='.sql', delete=False) as handle:
         handle.write('BEGIN READ ONLY; ' + sql_text + '; ROLLBACK;')
     try:
-        run = subprocess.run(['supabase', 'db', 'query', '--linked', '-f', handle.name, '--output-format', 'json'],
-                             capture_output=True, text=True, cwd=ROOT)
+        for attempt in range(1, attempts + 1):
+            run = runner(['supabase', 'db', 'query', '--linked', '-f', handle.name, '--output-format', 'json'],
+                         capture_output=True, text=True, cwd=ROOT)
+            try:
+                rows = parse_cli_rows(run.returncode, run.stdout, run.stderr)
+                break
+            except CliQueryError as exc:
+                if attempt == attempts or not any(t in str(exc) for t in TRANSIENT):
+                    raise
+                import time
+                time.sleep(2 * attempt)
     finally:
         os.unlink(handle.name)
-    if run.returncode != 0:
-        raise SystemExit('Production read-only query failed: ' + (run.stdout + run.stderr).strip()[-400:])
-    return json.JSONDecoder().raw_decode(run.stdout[run.stdout.index('{'):])[0]['rows'][0]['c']
+    if len(rows) != 1 or not isinstance(rows[0], dict) or 'c' not in rows[0]:
+        raise CliQueryError(f'Expected one row with column "c", got {len(rows)} row(s)')
+    return rows[0]['c']
 
 
 def production_counts(tables):
@@ -111,7 +166,11 @@ def main(archive):
         finally:
             psql(LOCAL, '-c', f'DROP DATABASE IF EXISTS {SCRATCH}', check=False)
     tables = [t for t in sorted(set(dump_counts['restorable']) | set(dump_counts['platform'])) if NAME.match(t)]
-    live = production_counts(tables)
+    try:
+        live = production_counts(tables)
+    except CliQueryError as exc:  # The restore result stands; production comparison is reported as unavailable.
+        live = {}
+        report['production_comparison_error'] = str(exc)
     report['tables'] = {t: {'in_backup': dump_counts['restorable'].get(t, dump_counts['platform'].get(t)),
                             'restored': restored.get(t, 'not restored (platform schema)' if t in dump_counts['platform'] else None),
                             'production_now': live.get(t)} for t in tables}
@@ -120,7 +179,20 @@ def main(archive):
     report['bot_tables_missing_from_backup'] = missing_bot
     report['restored_equals_backup_for_every_application_table'] = exact and report['data_restore'] == 'ok'
     report['production_differences'] = {t: v for t, v in report['tables'].items() if v['in_backup'] != v['production_now']}
-    ok = exact and report['data_restore'] == 'ok' and not missing_bot and not report['schema_restore_errors']['other']
+    # Writes after the backup are normal (the bot keeps running). A core table SHRINKING is not: it would mean
+    # rows missing from production that the backup holds, so it fails the verdict. kv/user_state churn by design.
+    core = ('public.users', 'public.messages', 'public.referrals', 'public.orders')
+    report['production_drift_since_backup'] = {t: v['production_now'] - v['in_backup'] for t, v in report['tables'].items()
+                                               if isinstance(v['production_now'], int) and isinstance(v['in_backup'], int)
+                                               and v['production_now'] != v['in_backup']}
+    shrunk = [t for t in core if report['production_drift_since_backup'].get(t, 0) < 0]
+    report['core_tables_shrunk_since_backup'] = shrunk
+    report['limitations'] = ('Supabase-managed schemas (auth, storage, realtime, vault, ...) are dumped and their row counts '
+                             'compared, but are not restored: their structure belongs to the Supabase service versions. '
+                             'Recovering them means restoring into a Supabase project (Dashboard restore or a new project), '
+                             'not a plain database. Application tables are restored and verified row for row by count.')
+    ok = exact and report['data_restore'] == 'ok' and not missing_bot and not report['schema_restore_errors']['other'] \
+        and 'production_comparison_error' not in report and not shrunk
     report['verdict'] = 'RESTORE VERIFIED' if ok else 'RESTORE NOT VERIFIED'
     print(json.dumps(report, indent=2))
     return 0 if ok else 1

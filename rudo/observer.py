@@ -82,6 +82,14 @@ def connect(dsn,allow_remote,expected_role,row_factory=None,autocommit=False):
             yield conn
     except PoolTimeout:
         raise ApiError(503,'database_unavailable') from None
+    except psycopg.OperationalError:
+        # Connections can die while idle (e.g. the host slept or the pooler recycled them). Sweep the idle
+        # ones now so the next request gets a live connection instead of another dead one.
+        try:
+            pool.check()
+        except Exception:
+            pass
+        raise ApiError(503,'database_unavailable') from None
 
 
 class AccessAudit:
